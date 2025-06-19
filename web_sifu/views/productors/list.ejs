@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Productores</title>
+    <%- include('../partials/head') %>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+        <div id="app" class="container mt-5">
+            <h2 class="mb-4">Listado de Productores</h2>
+
+            <!-- Filtros y búsqueda -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" v-model="busqueda" @input="filtrarProductores" class="form-control"
+                            placeholder="Buscar productores...">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <select v-model="tipoProduccionFiltro" @change="filtrarProductores" class="form-select">
+                        <option value="">Todos los tipos de producción</option>
+                        <option v-for="tipo in tiposProduccion" :value="tipo">{{ tipo }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Mensajes de estado -->
+            <div v-if="loading" class="text-center my-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <p>Cargando productores...</p>
+            </div>
+
+            <div v-else-if="error" class="alert alert-danger">
+                {{ error }}
+            </div>
+
+            <div v-else-if="productoresFiltrados.length === 0" class="alert alert-warning">
+                No se encontraron productores que coincidan con los filtros.
+            </div>
+
+            <!-- Listado de productores -->
+            <div v-else class="row">
+                <div v-for="productor in productoresFiltrados" :key="productor.id" class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">{{ productor.perRef.perNombres }} {{
+                                productor.perRef.perApellidos }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-2">Información de Contacto</h6>
+                                <p class="mb-1"><i class="bi bi-telephone"></i> {{ productor.perRef.perTelefono }}</p>
+                                <p class="mb-1"><i class="bi bi-envelope"></i> {{ productor.perRef.perEmail }}</p>
+                                <p class="mb-0"><i class="bi bi-geo-alt"></i> {{ productor.perRef.perDireccion }}</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <h6 class="text-muted mb-2">Datos del Productor</h6>
+                                <p class="mb-1"><strong>Contacto:</strong> {{ productor.proNombreContacto }}</p>
+                                <p class="mb-1"><strong>Ubicación:</strong> {{ productor.proParroquia }}, {{
+                                    productor.proMunicipio }}</p>
+                                <p class="mb-1"><strong>Tipo de producción: </strong>
+                                    <span class="badge bg-success">{{ productor.proTipoProduccion }}</span>
+                                </p>
+                                <p class="mb-0"><strong>Registro:</strong>
+                                    {{ formatFecha(productor.proFechaRegistro) }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <button @click="verDetalles(productor)" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="bi bi-eye"></i> Ver detalles
+                            </button>
+                            <!-- <button @click="editarProductor(productor)" class="btn btn-outline-secondary btn-sm me-2">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            <button @click="confirmarEliminar(productor)" class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Paginación -->
+            <nav v-if="totalPaginas > 1" aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" :class="{ disabled: paginaActual === 1 }">
+                        <button class="page-link" @click="cambiarPagina(paginaActual - 1)">Anterior</button>
+                    </li>
+                    <li v-for="n in totalPaginas" :key="n" class="page-item" :class="{ active: n === paginaActual }">
+                        <button class="page-link" @click="cambiarPagina(n)">{{ n }}</button>
+                    </li>
+                    <li class="page-item" :class="{ disabled: paginaActual === totalPaginas }">
+                        <button class="page-link" @click="cambiarPagina(paginaActual + 1)">Siguiente</button>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Modal  -->
+            <div class="modal fade" id="productorModal" tabindex="-1" aria-labelledby="productorModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title" id="productorModalLabel">Detalle Productor</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" v-if="productorSeleccionado">
+                            <!-- Encabezado con foto y datos básicos -->
+                            <div class="row mb-4">
+                                <div class="col-md-3 text-center">
+                                    <div class="rounded-circle bg-light p-1 mb-3"
+                                        style="width: 150px; height: 150px; margin: 0 auto;">
+                                        <img v-if="productorSeleccionado.perRef.fotoUrl"
+                                            :src="productorSeleccionado.perRef.fotoUrl" class="img-fluid rounded-circle"
+                                            alt="Foto del productor">
+                                        <i v-else class="bi bi-person-circle"
+                                            style="font-size: 140px; color: #6c757d;"></i>
+                                    </div>
+                                    <h4>{{ productorSeleccionado.perRef.perNombres }} {{
+                                        productorSeleccionado.perRef.perApellidos }}</h4>
+                                    <p class="text-muted">{{ productorSeleccionado.proTipoProduccion }}</p>
+                                </div>
+                                <div class="col-md-9">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong><i class="bi bi-telephone"></i> Teléfono:</strong> {{
+                                                productorSeleccionado.perRef.perTelefono }}</p>
+                                            <p><strong><i class="bi bi-envelope"></i> Email:</strong> {{
+                                                productorSeleccionado.perRef.perEmail }}</p>
+                                            <p><strong><i class="bi bi-geo-alt"></i> Dirección:</strong> {{
+                                                productorSeleccionado.perRef.perDireccion }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Detalles de producción -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0"><i class="bi bi-basket"></i> Información de Producción</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Nombre de Contacto:</strong> {{
+                                                productorSeleccionado.proNombreContacto }}</p>
+                                            <p><strong>Municipio:</strong> {{ productorSeleccionado.proMunicipio }}</p>
+                                            <p><strong>Parroquia:</strong> {{ productorSeleccionado.proParroquia }}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Tipo de Producción:</strong> {{
+                                                productorSeleccionado.proTipoProduccion }}</p>
+                                            <p><strong>Fecha Registro:</strong> {{
+                                                formatFecha(productorSeleccionado.proFechaRegistro) }}</p>
+                                            <p><strong>Estado: </strong>
+                                                <span
+                                                    :class="`badge bg-${productorSeleccionado.perRef.perEstado === 'activo' ? 'success' : 'secondary'}`">
+                                                    {{ productorSeleccionado.perRef.perEstado }}
+                                                </span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sección de productos asociados (opcional) -->
+                            <div class="card mb-4" >
+                                <div class="card-header bg-danger bg-gradient text-white">
+                                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Productos que Ofrece</h5>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-group" v-if="productos.length > 0">
+                                        <li v-for="producto in productos" :key="producto.id" class="list-group-item capitalize">
+                                            {{ producto.prdNombre }} - {{ producto.catRef.catNombre }}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Notas adicionales -->
+                            <div class="card">
+                                <div class="card-header bg-danger bg-gradient text-white">
+                                    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Observaciones</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p v-if="productorSeleccionado.observaciones">{{ productorSeleccionado.observaciones
+                                        }}
+                                    </p>
+                                    <p v-else class="text-muted">No hay observaciones registradas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="bi bi-x-circle"></i> Cerrar
+                            </button>
+                            <!-- <button type="button" class="btn btn-primary"
+                                @click="editarProductor(productorSeleccionado)">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <script>
+            const { createApp } = Vue;
+
+            createApp({
+                data() {
+                    return {
+                        productores: [],
+                        productorSeleccionado: null,
+                        productos: [],
+                        productoresFiltrados: [],
+                        loading: true,
+                        error: null,
+                        busqueda: '',
+                        tipoProduccionFiltro: '',
+                        paginaActual: 1,
+                        itemsPorPagina: 6,
+                        modal: null,
+                    }
+                },
+                computed: {
+                    tiposProduccion() {
+                        return [...new Set(this.productores.map(p => p.proTipoProduccion))];
+                    },
+                    totalPaginas() {
+                        return Math.ceil(this.productoresFiltrados.length / this.itemsPorPagina);
+                    },
+                    productoresPaginados() {
+                        const inicio = (this.paginaActual - 1) * this.itemsPorPagina;
+                        const fin = inicio + this.itemsPorPagina;
+                        return this.productoresFiltrados.slice(inicio, fin);
+                    }
+                },
+                methods: {
+                    async fetchProductores() {
+                        try {
+                            const response = await fetch('/productors/api/listar');
+                            if (!response.ok) throw new Error('Error al cargar productores');
+                            this.productores = await response.json();
+                            this.productoresFiltrados = [...this.productores];
+                        } catch (err) {
+                            this.error = err.message;
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+                    filtrarProductores() {
+                        this.productoresFiltrados = this.productores.filter(p => {
+                            const textoBusqueda = `${p.perRef.perNombres} ${p.perRef.perApellidos} ${p.perRef.perIdentificacion} ${p.proMunicipio} ${p.proParroquia}`.toLowerCase();
+                            const coincideBusqueda = textoBusqueda.includes(this.busqueda.toLowerCase());
+                            const coincideTipo = !this.tipoProduccionFiltro || p.proTipoProduccion === this.tipoProduccionFiltro;
+                            return coincideBusqueda && coincideTipo;
+                        });
+                        // Resetear a primera página al filtrar
+                        this.paginaActual = 1;
+                    },
+                    formatFecha(fechaISO) {
+                        if (!fechaISO) return 'No registrada';
+                        const fecha = new Date(fechaISO);
+                        return fecha.toLocaleDateString('es-ES');
+                    },
+                    async verDetalles(productor) {
+                        console.log('Ver detalles:', productor);
+
+                        this.productorSeleccionado = productor;
+
+                        // Cargar productos asociados para ver su detalles
+                        try {
+                            const response = await fetch(`/productors/api/products/${productor.id}`);
+                            if (response.ok) {
+                                const data = await response.json();
+                                console.log('Productos cargados:', data);
+                                this.productos = data.map(item => {
+                                    return item.prdRef
+                                });
+                                //this.productos = data || [];
+                            }
+                        } catch (error) {
+                            console.error('Error al cargar productos:', error);
+                        }
+
+                        // Mostrar modal
+                        if (!this.modal) {
+                            this.modal = new bootstrap.Modal(document.getElementById('productorModal'));
+                        }
+                        this.modal.show();
+                    },
+                    formatGenero(genero) {
+                        const generos = {
+                            'MASCULINO': 'Masculino',
+                            'FEMENINO': 'Femenino',
+                            'OTRO': 'Otro',
+                            'NO_ESPECIFICA': 'Prefiero no especificar'
+                        };
+                        return generos[genero] || genero;
+                    },
+                    editarProductor(productor) {
+                        // Implementar lógica para editar
+                        console.log('Editar:', productor);
+                    },
+                    confirmarEliminar(productor) {
+                        if (confirm(`¿Está seguro de eliminar a ${productor.perRef.perNombres} ${productor.perRef.perApellidos}?`)) {
+                            this.eliminarProductor(productor.id);
+                        }
+                    },
+                    async eliminarProductor(id) {
+                        try {
+                            const response = await fetch(`/api/productores/${id}`, {
+                                method: 'DELETE'
+                            });
+
+                            if (!response.ok) throw new Error('Error al eliminar');
+
+                            this.productores = this.productores.filter(p => p.id !== id);
+                            this.filtrarProductores();
+
+                        } catch (err) {
+                            alert(err.message);
+                        }
+                    },
+                    cambiarPagina(nuevaPagina) {
+                        if (nuevaPagina > 0 && nuevaPagina <= this.totalPaginas) {
+                            this.paginaActual = nuevaPagina;
+                        }
+                    }
+                },
+                mounted() {
+                    this.fetchProductores();
+                }
+            }).mount('#app');
+        </script>
+
+        <style>
+            .card {
+                transition: transform 0.2s;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .card-header {
+                padding: 0.75rem 1.25rem;
+            }
+
+            .badge {
+                font-size: 0.85em;
+            }
+            .capitalize {
+                text-transform: capitalize;
+            }
+        </style>
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

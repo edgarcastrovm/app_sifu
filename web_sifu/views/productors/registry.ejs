@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <%- include('../partials/head') %>
+</head>
+<body>
+    <%- include('../partials/header') %>
+    
+    <div class="content container mt-5">
+        
+        <div id="app" class="container mt-5">
+            <h2 class="mb-4">Registro de Productor</h2>
+            
+            <form @submit.prevent="submitForm" class="needs-validation" novalidate>
+              <!-- Sección de Datos Personales -->
+              <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                  <h5>Datos Personales</h5>
+                </div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <!-- Nombres -->
+                    <div class="col-md-6">
+                      <label for="nombres" class="form-label">Nombres *</label>
+                      <input type="text" class="form-control" id="nombres" 
+                             v-model="formData.perRef.perNombres" required>
+                      <div class="invalid-feedback">
+                        Por favor ingrese los nombres.
+                      </div>
+                    </div>
+                    
+                    <!-- Apellidos -->
+                    <div class="col-md-6">
+                      <label for="apellidos" class="form-label">Apellidos *</label>
+                      <input type="text" class="form-control" id="apellidos" 
+                             v-model="formData.perRef.perApellidos" required>
+                      <div class="invalid-feedback">
+                        Por favor ingrese los apellidos.
+                      </div>
+                    </div>
+                    
+                    <!-- Identificación -->
+                    <div class="col-md-4">
+                      <label for="identificacion" class="form-label">Identificación *</label>
+                      <input type="text" class="form-control" id="identificacion" 
+                             v-model="formData.perRef.perIdentificacion" required>
+                      <div class="invalid-feedback">
+                        Por favor ingrese la identificación.
+                      </div>
+                    </div>
+                    
+                    <!-- Teléfono -->
+                    <div class="col-md-4">
+                      <label for="telefono" class="form-label">Teléfono *</label>
+                      <input type="tel" class="form-control" id="telefono" 
+                             v-model="formData.perRef.perTelefono" required>
+                      <div class="invalid-feedback">
+                        Por favor ingrese el teléfono.
+                      </div>
+                    </div>
+                    
+                    <!-- Email -->
+                    <div class="col-md-4">
+                      <label for="email" class="form-label">Email *</label>
+                      <input type="email" class="form-control" id="email" 
+                             v-model="formData.perRef.perEmail" required>
+                      <div class="invalid-feedback">
+                        Por favor ingrese un email válido.
+                      </div>
+                    </div>
+                    
+                    <!-- Dirección -->
+                    <div class="col-12">
+                      <label for="direccion" class="form-label">Dirección *</label>
+                      <input type="text" class="form-control" id="direccion" 
+                             v-model="formData.perRef.perDireccion" required>
+                      <div class="invalid-feedback">
+                        Por favor ingrese la dirección.
+                      </div>
+                    </div>
+                    
+                    <!-- Fecha Nacimiento -->
+                    <div class="col-md-4">
+                      <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento *</label>
+                      <input type="date" class="form-control" id="fechaNacimiento" 
+                             v-model="formData.perRef.perFechaNacimiento" required>
+                      <div class="invalid-feedback">
+                        Por favor ingrese la fecha de nacimiento.
+                      </div>
+                    </div>
+                    
+                    <!-- Género -->
+                    <div class="col-md-4">
+                      <label for="genero" class="form-label">Género *</label>
+                      <select class="form-select" id="genero" 
+                              v-model="formData.perRef.perGenero" required>
+                        <option value="">Seleccione...</option>
+                        <option value="MASCULINO">Masculino</option>
+                        <option value="FEMENINO">Femenino</option>
+                        <option value="OTRO">Otro</option>
+                        <option value="NO_ESPECIFICA">Prefiero no especificar</option>
+                      </select>
+                      <div class="invalid-feedback">
+                        Por favor seleccione el género.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Sección de Datos del Productor -->
+              <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                  <h5>Datos del Productor</h5>
+                </div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <!-- Nombre de Contacto -->
+                    <div class="col-md-6">
+                      <label for="nombreContacto" class="form-label">Nombre de Contacto *</label>
+                      <input type="text" class="form-control" id="nombreContacto" 
+                             v-model="formData.proNombreContacto" required>
+                      <div class="invalid-feedback">
+                        Por favor ingrese el nombre de contacto.
+                      </div>
+                    </div>
+                    
+                    <!-- Municipio -->
+                    <div class="col-md-3">
+                      <label for="municipio" class="form-label">Municipio *</label>
+                      <input type="text" class="form-control" id="municipio" 
+                             v-model="formData.proMunicipio" required>
+                      <div class="invalid-feedback">
+                        Por favor ingrese el municipio.
+                      </div>
+                    </div>
+                    
+                    <!-- Parroquia -->
+                    <div class="col-md-3">
+                      <label for="parroquia" class="form-label">Parroquia *</label>
+                      <input type="text" class="form-control" id="parroquia" 
+                             v-model="formData.proParroquia" required>
+                      <div class="invalid-feedback">
+                        Por favor ingrese la parroquia.
+                      </div>
+                    </div>
+                    
+                    <!-- Tipo de Producción -->
+                    <div class="col-md-6">
+                      <label for="tipoProduccion" class="form-label">Tipo de Producción *</label>
+                      <select class="form-select" id="tipoProduccion" 
+                              v-model="formData.proTipoProduccion" required>
+                        <option value="">Seleccione...</option>
+                        <option value="Agrícola">Agrícola</option>
+                        <option value="Pecuaria">Pecuaria</option>
+                        <option value="Agroindustrial">Agroindustrial</option>
+                        <option value="Mixta">Mixta</option>
+                      </select>
+                      <div class="invalid-feedback">
+                        Por favor seleccione el tipo de producción.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Botones -->
+              <div class="d-flex justify-content-between">
+                <button type="button" class="btn btn-secondary" @click="resetForm">
+                  Limpiar Formulario
+                </button>
+                <button type="submit" class="btn btn-primary">
+                  <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  Registrar Productor
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <script>
+          const { createApp } = Vue;
+          
+          createApp({
+            data() {
+              return {
+                loading: false,
+                formData: {
+                  perRef: {
+                    perNombres: '',
+                    perApellidos: '',
+                    perIdentificacion: '',
+                    perTelefono: '',
+                    perEmail: '',
+                    perDireccion: '',
+                    perFechaNacimiento: '',
+                    perGenero: '',
+                    perEstado: 'activo'
+                  },
+                  proNombreContacto: '',
+                  proMunicipio: '',
+                  proParroquia: '',
+                  proTipoProduccion: '',
+                  proFechaRegistro: new Date().toISOString()
+                }
+              }
+            },
+            methods: {
+              validateForm() {
+                const forms = document.querySelectorAll('.needs-validation');
+                let isValid = true;
+                
+                Array.from(forms).forEach(form => {
+                  if (!form.checkValidity()) {
+                    isValid = false;
+                    form.classList.add('was-validated');
+                  }
+                });
+                
+                return isValid;
+              },
+              async submitForm() {
+                if (!this.validateForm()) return;
+                
+                this.loading = true;
+                
+                try {
+                  const response = await fetch('/productors/api/registry', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.formData)
+                  });
+                  
+                  if (!response.ok) {
+                    throw new Error(await response.text());
+                  }
+                  
+                  const result = await response.json();
+                  alert('Productor registrado exitosamente!');
+                  this.resetForm();
+                  
+                } catch (error) {
+                  console.error('Error:', error);
+                  alert('Error al registrar: ' + error.message);
+                } finally {
+                  this.loading = false;
+                }
+              },
+              resetForm() {
+                this.formData = {
+                  perRef: {
+                    perNombres: '',
+                    perApellidos: '',
+                    perIdentificacion: '',
+                    perTelefono: '',
+                    perEmail: '',
+                    perDireccion: '',
+                    perFechaNacimiento: '',
+                    perGenero: '',
+                    perEstado: 'activo'
+                  },
+                  proNombreContacto: '',
+                  proMunicipio: '',
+                  proParroquia: '',
+                  proTipoProduccion: '',
+                  proFechaRegistro: new Date().toISOString()
+                };
+                
+                // Resetear validación
+                const forms = document.querySelectorAll('.needs-validation');
+                Array.from(forms).forEach(form => {
+                  form.classList.remove('was-validated');
+                });
+              }
+            }
+          }).mount('#app');
+          </script>
+
+    </div>
+
+    <%- include('../partials/footer') %>
+</body>
+</html>

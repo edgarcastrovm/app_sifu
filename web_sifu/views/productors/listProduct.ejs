@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Productores</title>
+    <%- include('../partials/head') %>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+
+        <div id="app" class="container mt-5" data-user='<%- JSON.stringify(currentUser) %>'>
+            <!-- Sección de productos asociados (opcional) -->
+            <div class="card mb-4">
+                <div class="card-header bg-danger bg-gradient text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Productos que Ofrece</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group" v-if="productosActuales.length > 0">
+                        <li v-for="producto in productosActuales" :key="producto.id" class="list-group-item capitalize">
+                            {{ producto.prdNombre }} - {{ producto.catRef.catNombre }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <h4 class="mb-4">Crear Nueva Oferta</h4>
+
+            <form @submit.prevent="submitForm" class="needs-validation" novalidate>
+
+                <!-- Sección de Selección de Producto -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success bg-gradient text-white">
+                        <h5>1. Seleccionar Producto</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Lista de productos -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Buscar Producto</label>
+                                    <input type="text" class="form-control" v-model="busquedaProducto"
+                                        placeholder="Nombre del producto...">
+                                </div>
+
+                                <div class="list-group product-list" style="max-height: 300px; overflow-y: auto;">
+                                    <a href="#" class="list-group-item list-group-item-action"
+                                        v-for="producto in productosFiltrados" :key="producto.id"
+                                        @click.prevent="seleccionarProducto(producto)"
+                                        :class="{ 'active': productoSeleccionado && productoSeleccionado.id === producto.id }">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{{ producto.prdNombre }}</h6>
+                                            <small>{{ producto.catRef.catNombre }}</small>
+                                        </div>
+                                        <p class="mb-1 small text-muted">{{ producto.prdDescripcion }}</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección de Detalles de la Oferta -->
+                <div class="card mb-4">
+                    <div class="card-header bg-success bg-gradient text-white">
+                        <h5>2. Detalles de la Oferta</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <!-- Unidad de Medida -->
+                            <div class="col-md-4">
+                                <label for="unidadMedida" class="form-label">Unidad de Medida *</label>
+                                <select class="form-select" id="unidadMedida" v-model="formData.ofeUnidadMedida"
+                                    required>
+                                    <option value="" disabled selected>Seleccione...</option>
+                                    <option value="kg">Kilogramos (kg)</option>
+                                    <option value="g">Gramos (g)</option>
+                                    <option value="lb">Libras (lb)</option>
+                                    <option value="unidad">Unidad</option>
+                                    <option value="docena">Docena</option>
+                                    <option value="paquete">Paquete</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor seleccione la unidad de medida.
+                                </div>
+                            </div>
+
+                            <!-- Precio -->
+                            <div class="col-md-4">
+                                <label for="precio" class="form-label">Precio *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" step="0.01" min="0" class="form-control" id="precio"
+                                        v-model="formData.ofePrecio" required>
+                                </div>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese un precio válido.
+                                </div>
+                            </div>
+
+                            <!-- Cantidad Disponible -->
+                            <div class="col-md-4">
+                                <label for="cantidad" class="form-label">Cantidad Disponible *</label>
+                                <input type="number" min="1" class="form-control" id="cantidad"
+                                    v-model="formData.ofeCantidadDisponible" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingrese la cantidad disponible.
+                                </div>
+                            </div>
+
+                            <!-- URL de Foto -->
+                            <div class="col-12">
+                                <label for="foto" class="form-label">URL de la Foto (Opcional)</label>
+                                <input type="url" class="form-control" id="foto" v-model="formData.ofeUrlFoto"
+                                    placeholder="https://ejemplo.com/foto.jpg">
+                                <div class="form-text">Puede dejar este campo vacío si no tiene una imagen.</div>
+                            </div>
+
+                            <!-- Estado -->
+                            <div class="col-md-6">
+                                <label for="estado" class="form-label">Estado *</label>
+                                <select class="form-select" id="estado" v-model="formData.ofeEstado" required>
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                    <option value="agotado">Agotado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones del formulario -->
+                <div class="d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" @click="resetForm">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Crear Oferta
+                    </button>
+                </div>
+
+            </form>
+        </div>
+        <script>
+            window.currentUser = <%- JSON.stringify(currentUser) %>;
+        </script>
+        <script>
+            const { createApp } = Vue;
+
+            createApp({
+                data() {
+                    return {
+                        user: window.currentUser,
+                        loading: false,
+                        productos: [],
+                        productosActuales: [],
+                        productoSeleccionado: null,
+                        busquedaProducto: '',
+                        formData: {
+                            id: null,
+                            proRef: {
+                                id: null
+                            },
+                            prdRef: {
+                                id: null
+                            },
+                            ofeUnidadMedida: '',
+                            ofePrecio: null,
+                            ofeCantidadDisponible: null,
+                            ofeUrlFoto: '',
+                            ofeEstado: 'activo',
+                            ofeFechaCreacion: new Date().toISOString(),
+                            ofeUltimaActualizacion: null
+                        }
+                    }
+                },
+                computed: {
+                    productosFiltrados() {
+                        if (!this.busquedaProducto) return this.productos;
+                        return this.productos.filter(p =>
+                            p.prdNombre.toLowerCase().includes(this.busquedaProducto.toLowerCase()) ||
+                            p.prdDescripcion.toLowerCase().includes(this.busquedaProducto.toLowerCase())
+                        );
+                    }
+                },
+                methods: {
+                    async fetchProductos() {
+                        try {
+                            const response = await fetch(`/productos/api/listar`);
+                            if (response.ok) {
+                                const data = await response.json();
+                                console.log('Productos cargados:', data);
+                                this.productos = data.map(item => {
+                                    return item
+                                });
+                                //this.productos = data || [];
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            alert('Error al cargar los productos');
+                        }
+                    },
+                    async fetchProductosActuales() {
+                        try {
+                            console.log('Cargando productos actuales para el usuario:', this.user.id);
+                            const response = await fetch(`/productors/api/products/${this.user.id}`);
+                            if (response.ok) {
+                                const data = await response.json();
+                                console.log('Productos cargados:', data);
+                                this.productosActuales = data.map(item => {
+                                    return item.prdRef
+                                });
+                                //this.productos = data || [];
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            alert('Error al cargar los productos');
+                        }
+                    },
+                    seleccionarProducto(producto) {
+                        this.productoSeleccionado = producto;
+                        this.formData.prdRef.id = producto.id;
+                    },
+                    validateForm() {
+                        const forms = document.querySelectorAll('.needs-validation');
+                        let isValid = true;
+
+                        Array.from(forms).forEach(form => {
+                            if (!form.checkValidity()) {
+                                isValid = false;
+                                form.classList.add('was-validated');
+                            }
+                        });
+
+                        // Validación adicional para producto seleccionado
+                        if (!this.formData.prdRef.id) {
+                            isValid = false;
+                            alert('Por favor seleccione un producto');
+                        }
+
+                        return isValid;
+                    },
+                    async submitForm() {
+                        if (!this.validateForm()) return;
+
+                        this.loading = true;
+
+                        try {
+                            const response = await fetch('/api/ofertas', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(this.formData)
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(await response.text());
+                            }
+
+                            const result = await response.json();
+                            alert('Oferta creada exitosamente!');
+                            this.resetForm();
+
+                        } catch (error) {
+                            console.error('Error:', error);
+                            alert('Error al crear la oferta: ' + error.message);
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+                    resetForm() {
+                        this.formData = {
+                            id: null,
+                            proRef: {
+                                id: null
+                            },
+                            prdRef: {
+                                id: null
+                            },
+                            ofeUnidadMedida: '',
+                            ofePrecio: null,
+                            ofeCantidadDisponible: null,
+                            ofeUrlFoto: '',
+                            ofeEstado: 'activo',
+                            ofeFechaCreacion: new Date().toISOString(),
+                            ofeUltimaActualizacion: null
+                        };
+                        this.productoSeleccionado = null;
+                        this.busquedaProducto = '';
+
+                        // Resetear validación
+                        const forms = document.querySelectorAll('.needs-validation');
+                        Array.from(forms).forEach(form => {
+                            form.classList.remove('was-validated');
+                        });
+                    }
+                },
+                mounted() {
+                    this.fetchProductos();
+                    this.fetchProductosActuales();
+                }
+            }).mount('#app');
+        </script>
+
+        <style>
+            .product-list {
+                border: 1px solid #dee2e6;
+                border-radius: 0.25rem;
+            }
+
+            .product-list .list-group-item {
+                border-left: none;
+                border-right: none;
+            }
+
+            .product-list .list-group-item:first-child {
+                border-top: none;
+            }
+
+            .product-list .list-group-item:hover {
+                background-color: #f8f9fa;
+            }
+
+            .product-list .list-group-item.active {
+                background-color: #0d6efd;
+                border-color: #0d6efd;
+            }
+
+            /* Estilo para imágenes rotas */
+            img {
+                object-fit: cover;
+            }
+
+            /* Estilos para los cards */
+            .card {
+                margin-bottom: 1.5rem;
+            }
+
+            .card-header {
+                padding: 0.75rem 1.25rem;
+            }
+        </style>
+        <%- include('../partials/footer') %>
+</body>
+
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Productos</title>
+    <%- include('../partials/head') %>
+</head>
+
+<body>
+    <%- include('../partials/header') %>
+        <div id="app" class="content container mt-5">
+            <h2 class="mb-4">Lista de Productos</h2>
+
+            <!-- Mensaje de carga -->
+            <div v-if="loading" class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+            </div>
+
+            <!-- Mensaje si no hay productos -->
+            <div v-else-if="productos.length === 0" class="alert alert-warning">
+                No se encontraron productos.
+            </div>
+
+            <!-- Lista de productos -->
+            <div v-else class="row">
+                <div v-for="producto in productos" :key="producto.id" class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ producto.prdNombre }}</h5>
+                            <p class="card-text">{{ producto.prdDescripcion }}</p>
+                            <p class="text-muted">Categoría: {{ producto.catRef.catNombre }}</p>
+
+                            <img class="img-thumbnail" :src="producto.prdUrlFoto" :alt="producto.prdNombre"
+                                width="200px">
+                        </div>
+                        <div class="card-footer">
+                            <form @submit.prevent="agregarAlCarrito(producto)">
+                                <input type="hidden" name="proId" :value="producto.id">
+
+                                <!-- <label for="cantidad" class="form-label">Cantidad:</label>
+                                <input type="number" id="cantidad" name="cantidad" v-model="producto.cantidad" min="1"
+                                    :max="producto.prdCantidadDisponible || 10" class="form-control mb-2" required> -->
+
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    Solicitar Producto
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const { createApp } = Vue;
+
+            createApp({
+                data() {
+                    return {
+                        productos: [],
+                        loading: true,
+                        error: null
+                    }
+                },
+                methods: {
+                    async fetchProductos() {
+                        try {
+                            const response = await fetch('/productos/api/listar');
+                            console.log('Response:', response);
+                            if (!response.ok) throw new Error('Error al cargar productos');
+                            this.productos = await response.json();
+
+                            // Agregar propiedad cantidad a cada producto
+                            this.productos = this.productos.map(p => ({
+                                ...p,
+                                cantidad: 1
+                            }));
+
+                        } catch (err) {
+                            this.error = err.message;
+                            console.error('Error:', err);
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+                    agregarAlCarrito(producto) {
+                        // Aquí puedes implementar la lógica para agregar al carrito
+                        console.log('Agregando al carrito:', {
+                            id: producto.id,
+                            cantidad: producto.cantidad
+                        });
+
+                        // Ejemplo con fetch
+                        fetch('/api/carrito/agregar', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                proId: producto.id,
+                                cantidad: producto.cantidad
+                            })
+                        })
+                            .then(response => {
+                                if (!response.ok) throw new Error('Error al agregar al carrito');
+                                alert('Producto agregado al carrito');
+                            })
+                            .catch(err => {
+                                console.error('Error:', err);
+                                alert(err.message);
+                            });
+                    }
+                },
+                mounted() {
+                    this.fetchProductos();
+                }
+            }).mount('#app');
+        </script>
+
+        <style>
+            .card-title {
+                text-transform: uppercase;
+            }
+        </style>
+        <%- include('../partials/footer') %>
+</body>
+
+</html>
