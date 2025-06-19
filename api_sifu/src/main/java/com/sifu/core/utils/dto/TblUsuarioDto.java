@@ -55,9 +55,9 @@ public class TblUsuarioDto implements Serializable {
         entity.setUsuNombreUsuario(this.usuNombreUsuario);
         entity.setUsuPasswordHash(this.usuPasswordHash);
         entity.setUsuRol(this.usuRol);
-        usuFechaUltimoLogin = this.usuFechaUltimoLogin;
-        usuEstado = this.usuEstado;
-        usuFechaCreacion = this.usuFechaCreacion;
+        entity.setUsuFechaUltimoLogin(this.usuFechaUltimoLogin);
+        entity.setUsuEstado(this.usuEstado);
+        entity.setUsuFechaCreacion(this.usuFechaCreacion);
         return entity;
     }
 }

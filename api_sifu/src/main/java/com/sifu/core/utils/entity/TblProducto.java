@@ -29,6 +29,8 @@ public class TblProducto {
 
     @Column(name = "prd_descripcion", length = Integer.MAX_VALUE)
     private String prdDescripcion;
+    @Column(name = "prd_url_foto", length = 500)
+    private String prdUrlFoto;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

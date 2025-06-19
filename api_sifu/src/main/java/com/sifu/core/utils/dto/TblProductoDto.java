@@ -48,6 +48,7 @@ public class TblProductoDto implements Serializable {
         id = entity.getId();
         prdNombre = entity.getPrdNombre();
         prdDescripcion = entity.getPrdDescripcion();
+        prdUrlFoto = entity.getPrdUrlFoto();
         catRef = new TblCatalogoDto(entity.getCatRef());
         prdFechaCreacion = entity.getPrdFechaCreacion();
 
@@ -58,6 +59,7 @@ public class TblProductoDto implements Serializable {
         entity.setId(id);
         entity.setPrdNombre(prdNombre);
         entity.setPrdDescripcion(prdDescripcion);
+        entity.setPrdUrlFoto(prdUrlFoto);
         entity.setCatRef(catRef.toEntity());
         entity.setPrdFechaCreacion(prdFechaCreacion);
         return entity;

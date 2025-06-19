@@ -46,6 +46,7 @@ public class TblOfertaProductoDto implements Serializable {
         if (entity.getPrdRef() != null) {
             this.prdRef = new TblProductoDto(entity.getPrdRef());
         }
+        this.id = entity.getId();
         this.ofeUnidadMedida = entity.getOfeUnidadMedida();
         this.ofePrecio = entity.getOfePrecio();
         this.ofeCantidadDisponible = entity.getOfeCantidadDisponible();
