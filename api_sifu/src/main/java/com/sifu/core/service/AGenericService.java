@@ -20,6 +20,7 @@ public abstract class AGenericService<T, ID> implements IGenericService<T, ID> {
         var data = repo.findAll();
         return data;
     }
+
     @Override
     public Page<T> findAll(Pageable pageable) {
         var data = repo.findAll(pageable);

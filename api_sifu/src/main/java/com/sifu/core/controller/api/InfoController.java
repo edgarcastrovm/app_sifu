@@ -1,20 +1,16 @@
-package com.sifu.core.controller;
+package com.sifu.core.controller.api;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/")
+@RestController("apiInfoController")
+@RequestMapping("/api")
 public class InfoController {
 
-    @GetMapping
-    public ResponseEntity<?> hi() {
-        return ResponseEntity.ok("Welcome to SiFu Api");
-    }
     @GetMapping("/hc")
-    public ResponseEntity<?> hc() {
-        return ResponseEntity.ok("ok");
+    public ResponseEntity<?> info() {
+        return ResponseEntity.ok("Api UP");
     }
 }

@@ -3,7 +3,6 @@ package com.sifu.core.utils.dto.dominio;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.sifu.core.utils.entity.TblUsuario;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,11 +19,11 @@ public class LoginDto {
     private String rol;
     private String token;
 
-    public LoginDto(TblUsuario entity) {
-        id = entity.getId();
-        email = entity.getUsuNombreUsuario();
-        password = entity.getUsuPasswordHash();
-        rol = entity.getUsuRol();
+    public LoginDto(Object entity) {
+        id = null;
+        email = null;
+        password = null;
+        rol = null;
     }
 
 

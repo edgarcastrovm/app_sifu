@@ -1,7 +1,6 @@
 package com.sifu.core.config.http;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
 
 
 @JsonInclude(JsonInclude.Include.NON_NULL) // Omite campos nulos en el JSON
