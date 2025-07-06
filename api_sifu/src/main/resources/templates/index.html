@@ -6,12 +6,15 @@
     <title>Inicio</title>
 </head>
 <body>
-<div layout:fragment="content">
-    <h1 class="display-4 mb-4">Bienvenido a la Página de Inicio</h1>
-    <p class="lead" th:text="${mensaje}">
-        <a th:href="@{/person}">IR</a>
-    </p>
-    <!--<button class="btn btn-success">¡Haz clic aquí!</button>-->
+<div class="row" layout:fragment="content">
+    <div class="card">
+        <div class="card-title fw-semibold mt-4">
+            <h3 class="text-center">Bienvenido a Siembra Futuro</h3>
+        </div>
+        <div class="card-body text-center">
+            <img th:src="@{/assets/images/backgrounds/landing-page.jpg}" width="95%" style="padding-bottom: 4%" alt="...">
+        </div>
+    </div>
 </div>
 </body>
 </html>

@@ -1,0 +1,13 @@
+.app-header, #main-wrapper[data-layout=vertical][data-sidebar-position=fixed] .left-sidebar {
+    position: fixed;
+    top: 0px;
+}
+
+.body-wrapper .container-fluid, .body-wrapper .container-sm, .body-wrapper .container-md, .body-wrapper .container-lg, .body-wrapper .container-xl, .body-wrapper .container-xxl {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 24px;
+    transition: 0.2s ease-in;
+    padding-top: 80px;
+}
