@@ -15667,7 +15667,7 @@ textarea.form-control-lg {
   margin-top: 24px;
   color: var(--bs-link-color);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   padding: 3px 0;
   line-height: 26px;
   text-transform: uppercase;
@@ -15736,7 +15736,7 @@ textarea.form-control-lg {
   height: 14px;
 }
 .sidebar-nav ul .sidebar-item .first-level .sidebar-item:last-child {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 .sidebar-nav ul .sidebar-item .first-level .sidebar-link .ti {
   font-size: 7px;
@@ -15967,7 +15967,7 @@ body {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   }
   .left-sidebar .scroll-sidebar {
-    height: calc(100vh - 240px);
+    height: calc(100vh - 100px);
   }
 }
 * {
@@ -16061,4 +16061,25 @@ ul {
   color: var(--bs-info);
 }
 
+.contenedor1 {
+  display: flex;
+  justify-content: center; 
+  align-items: center;  
+  padding-bottom: 15px;  
+  padding-top: 15px      
+}
+
+.planta {
+  background-color: #def;
+  border-radius: 4px;
+  font-size: 12px;
+  width: 120px;
+  text-align: center;
+}
+
+.planta img{
+  width: 20px;     /* ajusta a tu gusto */
+  display: block;
+  margin: 0 auto; 
+}
 /*# sourceMappingURL=styles.min.css.map */

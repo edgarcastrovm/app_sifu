@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es" layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Inicio</title>
+</head>
+<body>
+<div class="row" layout:fragment="content">
+    <div class="card">
+        <div class="card-title fw-semibold mt-4">
+            <h3 class="text-center">Bienvenido a Siembra Futuro</h3>
+        </div>
+        <div class="card-body text-center">
+            <img th:src="@{/assets/images/backgrounds/landing-page.jpg}" width="95%" style="padding-bottom: 4%" alt="...">
+        </div>
+    </div>
+</div>
+</body>
+</html>
