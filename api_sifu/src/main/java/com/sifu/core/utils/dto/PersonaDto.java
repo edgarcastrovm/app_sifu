@@ -19,9 +19,9 @@ public class PersonaDto implements Serializable {
     private Integer id;
     private String nombre;
     private String apellido;
-    private Integer cedula;
+    private String cedula;
     private String correo;
-    private Integer celular;
+    private String celular;
 
     public PersonaDto(Persona entiry) {
         this.nombre = entiry.getNombre();

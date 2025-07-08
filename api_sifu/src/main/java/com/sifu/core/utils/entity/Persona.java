@@ -1,4 +1,5 @@
 package com.sifu.core.utils.entity;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,18 +12,27 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "tbl_persona", schema = "sifubd")
 public class Persona {
-	
-	@Id
+
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-	
-	private String nombre;
+
+    @Column(name = "nombre", nullable = false, length = 60)
+    private String nombre;
+
+    @Column(name = "apellido", nullable = false, length = 60)
     private String apellido;
-    private Integer cedula;
+
+    @Column(name = "cedula", nullable = false, length = 15)
+    private String cedula;
+
+    @Column(name = "correo", nullable = false, length = 50)
     private String correo;
-    private Integer celular;
-    
-    
+
+    @Column(name = "celular", nullable = false, length = 20)
+    private String celular;
+
+
     @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)
     private Usuario usuario;
 
@@ -31,5 +41,5 @@ public class Persona {
 
     @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)
     private Agricultor agricultor;
-    
+
 }

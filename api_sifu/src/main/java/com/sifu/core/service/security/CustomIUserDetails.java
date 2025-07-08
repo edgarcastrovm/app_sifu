@@ -22,9 +22,9 @@ public class CustomIUserDetails implements UserDetails {
     }
 
     @Override
-    public String getPassword() { return usuario.getPassword(); }
+    public String getPassword() { return usuario.getClave(); }
     @Override
-    public String getUsername() { return usuario.getUsername(); }
+    public String getUsername() { return usuario.getAlias(); }
     @Override
     public boolean isAccountNonExpired() { return true; }
     @Override
@@ -32,5 +32,5 @@ public class CustomIUserDetails implements UserDetails {
     @Override
     public boolean isCredentialsNonExpired() { return true; }
     @Override
-    public boolean isEnabled() { return usuario.isEnabled(); }
+    public boolean isEnabled() { return usuario.getActivo(); }
 }

@@ -18,9 +18,13 @@ public class Usuario {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-	
+	@Column(unique = true, nullable = false, length = 32)
 	private String alias;
-	private String clave;
+
+    @Column(length = 100)
+    private String clave;
+
+    private Boolean activo;
 	
 	@OneToOne
     @JoinColumn(name = "persona_id")
