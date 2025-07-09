@@ -12,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class DataLoader implements CommandLineRunner {
@@ -25,80 +24,55 @@ public class DataLoader implements CommandLineRunner {
     private UsuarioRepository usuarioRepo;
     @Autowired
     private RolRepository rolRepo;
-    @Autowired private PasswordEncoder encoder;
+    @Autowired
+    private PasswordEncoder encoder;
 
     @Override
+    @Transactional
     public void run(String... args) {
-        log.info("Clave generada: {}",encoder.encode("admin"));
+        log.info("DataLoader start");
+        log.info("Insertando roles");
+        Rol rolAdmin = rolRepo.findByNombre("ADMIN").orElseGet(() ->
+                rolRepo.save(Rol.builder().nombre("ADMIN").build()));
 
-        if (rolRepo.findAll().isEmpty()) {
-            rolRepo.save(Rol.builder().id(null).nombre("ADMIN").build());
-            rolRepo.save(Rol.builder().id(null).nombre("CLIENTE").build());
-            rolRepo.save(Rol.builder().id(null).nombre("PRODUCTOR").build());
-        }
-        Optional<Persona> _persona = personaRepository.findByCedula("0000000001");
-        Persona persona = new Persona();
-        if (!_persona.isPresent()) {
-            persona.setCedula("1000000001");
-            persona.setNombre("admin");
-            persona.setApellido("admin");
-            persona.setCorreo("admin@sifu.com");
-            persona.setCelular("098123456");
-            personaRepository.save(persona);
-        }else {
-            persona = _persona.get();
-        }
+        Rol rolCliente = rolRepo.findByNombre("CLIENTE").orElseGet(() ->
+                rolRepo.save(Rol.builder().nombre("CLIENTE").build()));
 
-        Optional<Usuario> _usuario = usuarioRepo.findByAlias("admin");
-        Usuario usuario = new Usuario();
-        if (!_usuario.isPresent()) {
-            Rol adminRol = rolRepo.findAll().stream()
-                .filter(r -> r.getNombre().equals("ADMIN"))
-                .findFirst().orElseThrow();
-            log.info("Clave generada: {}",encoder.encode("admin"));
-            usuarioRepo.save(new Usuario(null, "admin", encoder.encode("admin"),true,persona, adminRol));
-        }else{
-            usuario = _usuario.get();
-        }
+        Rol rolAgricultor = rolRepo.findByNombre("AGRICULTOR").orElseGet(() ->
+                rolRepo.save(Rol.builder().nombre("AGRICULTOR").build()));
 
-         _persona = personaRepository.findByCedula("0000000002");
-        if (!_persona.isPresent()) {
-            persona.setCedula("0000000002");
-            persona.setNombre("cliente");
-            persona.setApellido("cliente");
-            persona.setCorreo("cliente@sifu.com");
-            persona.setCelular("098233456");
-            personaRepository.save(persona);
-        }else {
-            persona = _persona.get();
-        }
+        log.info("Termina insert roles");
+        log.info("Inicia insertando usuarios");
+        // Crear persona y usuario admin
+        crearPersonaYUsuario("1000000001", "admin", "admin@sifu.com", "098123456", "admin", "admin", rolAdmin);
+        // Crear persona y usuario cliente
+        crearPersonaYUsuario("2000000001", "cliente", "cliente@sifu.com", "098233456", "cliente", "clave123", rolCliente);
+        // Crear persona y usuario agricultor
+        crearPersonaYUsuario("3000000001", "agricultor", "agricultor@sifu.com", "081233456", "agricultor", "clave123", rolAgricultor);
+        log.info("Termina insert usuarios");
+    }
 
-        _usuario = usuarioRepo.findByAlias("cliente");
-        if (!_usuario.isPresent()) {
-            Rol userRol = rolRepo.findAll().stream()
-                    .filter(r -> r.getNombre().equals("CLIENTE"))
-                    .findFirst().orElseThrow();
-            usuarioRepo.save(new Usuario(null, "cliente", encoder.encode("clave123"),true, persona, userRol));
-        }
+    private void crearPersonaYUsuario(String cedula, String nombre, String correo, String celular,
+                                      String alias, String clave, Rol rol) {
+        try {
+            Persona persona = personaRepository.findByCedula(cedula).orElseGet(() -> {
+                Persona p = new Persona();
+                p.setCedula(cedula);
+                p.setNombre(nombre);
+                p.setApellido(nombre);
+                p.setCorreo(correo);
+                p.setCelular(celular);
+                return personaRepository.save(p);
+            });
+            log.info("Persona con cedula " + cedula + " registrado");
 
-        _persona = personaRepository.findByCedula("3000000001");
-        if (!_persona.isPresent()) {
-            persona.setCedula("3000000001");
-            persona.setNombre("cliente");
-            persona.setApellido("cliente");
-            persona.setCorreo("productor@sifu.com");
-            persona.setCelular("081233456");
-            personaRepository.save(persona);
-        }else {
-            persona = _persona.get();
-        }
-
-        _usuario = usuarioRepo.findByAlias("productor");
-        if (!_usuario.isPresent()) {
-            Rol userRol = rolRepo.findAll().stream()
-                    .filter(r -> r.getNombre().equals("PRODUCTOR"))
-                    .findFirst().orElseThrow();
-            usuarioRepo.save(new Usuario(null, "productor", encoder.encode("clave123"),true, persona, userRol));
+            if (usuarioRepo.findByAlias(alias).isEmpty()) {
+                String encodedPassword = encoder.encode(clave);
+                usuarioRepo.save(new Usuario(null, alias, encodedPassword, true, persona, rol));
+            }
+            log.info("Persona con alias " + alias + " registrado");
+        } catch (Exception e) {
+            log.error("Error insertando usuario:{}", e.getMessage());
         }
     }
 }

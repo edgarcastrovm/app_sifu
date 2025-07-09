@@ -18,19 +18,41 @@ public class CustomIUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Asegúrate de que el nombre del rol en la base ya tenga el prefijo ROL_
         return List.of(new SimpleGrantedAuthority(usuario.getRol().getNombre()));
     }
 
     @Override
-    public String getPassword() { return usuario.getClave(); }
+    public String getPassword() {
+        return usuario.getClave();
+    }
+
     @Override
-    public String getUsername() { return usuario.getAlias(); }
+    public String getUsername() {
+        return usuario.getAlias();
+    }
+
     @Override
-    public boolean isAccountNonExpired() { return true; }
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
     @Override
-    public boolean isAccountNonLocked() { return true; }
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
     @Override
-    public boolean isCredentialsNonExpired() { return true; }
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
     @Override
-    public boolean isEnabled() { return usuario.getActivo(); }
+    public boolean isEnabled() {
+        return Boolean.TRUE.equals(usuario.getActivo());
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
 }

@@ -10,12 +10,12 @@ public class SiteController {
 
 	@GetMapping({ "", "/" })
 	public String index() {
-		return "index";
+		return "public/index";
 	}
 
 	@GetMapping("/home")
 	public String home() {
-		return "index";
+		return "public/index";
 	}
 
 	// Login
