@@ -22,4 +22,9 @@ public class AdminController {
     public String reportesIa() {
         return "/admin/reportes/reportes_ia";
     }
+
+    @GetMapping("/reportes")
+    public String reportes() {
+        return "/admin/reportes/reportes";
+    }
 }

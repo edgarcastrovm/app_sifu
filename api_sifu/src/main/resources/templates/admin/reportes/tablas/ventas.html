@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<body>
+<div th:fragment="tbl-ventas">
+
+    <div class="container-fluid">
+        <!-- Formulario de fechas -->
+        <form id="filtro-form" class="row g-3 mb-3">
+            <div class="col-md-3">
+                <label for="fechaDesde" class="form-label">Desde</label>
+                <input type="date" class="form-control" id="fechaDesde" name="desde">
+            </div>
+            <div class="col-md-3">
+                <label for="fechaHasta" class="form-label">Hasta</label>
+                <input type="date" class="form-control" id="fechaHasta" name="hasta">
+            </div>
+            <div class="col-md-2 align-self-end">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </form>
+
+        <!-- Filtros por columnas -->
+<!--        <div class="row mb-3">-->
+<!--            <div class="col-md-3">-->
+<!--                <input type="text" class="form-control" placeholder="Filtrar por cliente" id="filtroCliente">-->
+<!--            </div>-->
+<!--            <div class="col-md-3">-->
+<!--                <input type="text" class="form-control" placeholder="Filtrar por producto" id="filtroProducto">-->
+<!--            </div>-->
+<!--            <div class="col-md-3">-->
+<!--                <input type="text" class="form-control" placeholder="Filtrar por agricultor" id="filtroAgricultor">-->
+<!--            </div>-->
+<!--        </div>-->
+
+        <!-- Tabla -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover align-middle" id="tabla-reporte">
+                <thead class="table-primary">
+                <tr>
+                    <th>Factura</th>
+                    <th>Fecha</th>
+                    <th>Método Pago</th>
+                    <th>Total</th>
+                    <th>Cliente</th>
+                    <th>Cédula</th>
+                    <th>Email</th>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Subtotal</th>
+                    <th>Agricultor</th>
+                    <th>Stock</th>
+                    <th>Unidad</th>
+                </tr>
+                </thead>
+                <tbody id="tbody-reporte">
+                <!-- filas dinámicas -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+
+        function inicializarDataTable() {
+            if ($.fn.DataTable.isDataTable('#tabla-reporte')) {
+                $('#tabla-reporte').DataTable().destroy();
+            }
+
+            dataTable = $('#tabla-reporte').DataTable({
+                dom: 'Bfrtip',
+                buttons: [
+                    'colvis', // para mostrar/ocultar columnas
+                    {
+                        extend: 'pdfHtml5',
+                        text: 'PDF',
+                        orientation: 'landscape',
+                        pageSize: 'A3',
+                        exportOptions: {
+                            columns: ':visible'
+                        },
+                        customize: function (doc) {
+                            doc.defaultStyle.fontSize = 10;
+                        }
+                    },
+                    'excelHtml5',
+                    'print'
+                ],
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50, 100],
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                }
+            });
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+            const tbody = document.getElementById("tbody-reporte");
+
+            const filtros = {
+                cliente: document.getElementById("filtroCliente"),
+                producto: document.getElementById("filtroProducto"),
+                agricultor: document.getElementById("filtroAgricultor")
+            };
+
+            function cargarDatos(desde = "", hasta = "") {
+                let url = `http://localhost:8080/sifu/api/reporte`;
+                const params = new URLSearchParams();
+                if (desde) params.append("desde", desde);
+                if (hasta) params.append("hasta", hasta);
+                if (params.toString()) url += `?${params.toString()}`;
+
+                fetch(url)
+                    .then(resp => resp.json())
+                    .then(resp_json => {
+                        tbody.innerHTML = "";
+                        if (resp_json.code !=200){
+                            alert("no existen datos")
+                            return
+                        }
+                        data = resp_json.data
+                        data.forEach(item => {
+                            const row = document.createElement("tr");
+
+                            row.innerHTML = `
+                        <td>${item.facturaId}</td>
+                        <td>${item.fechaVenta ?? ''}</td>
+                        <td>${item.metodoPago ?? ''}</td>
+                        <td>${item.totalFactura? (item.totalFactura).toFixed(2) :''}</td>
+                        <td>${item.cliente ?? ''}</td>
+                        <td>${item.cedulaCliente ?? ''}</td>
+                        <td>${item.emailCliente ?? ''}</td>
+                        <td>${item.producto ?? ''}</td>
+                        <td>${item.categoria ?? ''}</td>
+                        <td>${item.precioUnitario ?? ''}</td>
+                        <td>${item.cantidad ?? ''}</td>
+                        <td>${item.subtotalItem ?? ''}</td>
+                        <td>${item.agricultor ?? ''}</td>
+                        <td>${item.stockDisponible ?? ''}</td>
+                        <td>${item.unidadMedida ?? ''}</td>
+                    `;
+
+                            tbody.appendChild(row);
+                        });
+
+                        // aplicarFiltros();
+                        inicializarDataTable();
+                    })
+                    .catch(err => console.error("Error:", err));
+            }
+
+            // function aplicarFiltros() {
+            //     const cliente = filtros.cliente.value.toLowerCase();
+            //     const producto = filtros.producto.value.toLowerCase();
+            //     const agricultor = filtros.agricultor.value.toLowerCase();
+            //
+            //     [...tbody.rows].forEach(row => {
+            //         const matchCliente = row.cells[4].textContent.toLowerCase().includes(cliente);
+            //         const matchProducto = row.cells[7].textContent.toLowerCase().includes(producto);
+            //         const matchAgricultor = row.cells[12].textContent.toLowerCase().includes(agricultor);
+            //
+            //         row.style.display = (matchCliente && matchProducto && matchAgricultor) ? "" : "none";
+            //     });
+            // }
+
+            // Eventos de filtro por texto
+            // filtros.cliente.addEventListener("input", aplicarFiltros);
+            // filtros.producto.addEventListener("input", aplicarFiltros);
+            // filtros.agricultor.addEventListener("input", aplicarFiltros);
+
+            // Filtro por fechas (form)
+            document.getElementById("filtro-form").addEventListener("submit", e => {
+                e.preventDefault();
+                const desde = document.getElementById("fechaDesde").value;
+                const hasta = document.getElementById("fechaHasta").value;
+                cargarDatos(desde, hasta);
+            });
+
+            // Carga inicial
+            cargarDatos();
+        });
+    </script>
+
+</div>
+</body>

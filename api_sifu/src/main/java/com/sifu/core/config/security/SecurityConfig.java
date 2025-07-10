@@ -28,6 +28,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/assets/**").permitAll()
                         .requestMatchers("/site/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ADMIN")
                         .requestMatchers("/cliente/**").hasAuthority("CLIENTE")
                         .requestMatchers("/agricultor/**").hasAuthority("AGRICULTOR")
@@ -40,7 +41,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/site/home")
                         .permitAll()
                 )
                 .userDetailsService(customUserDetailsService)

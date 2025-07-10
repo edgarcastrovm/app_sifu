@@ -1,3 +1,5 @@
 
 web_sifu/.env
 /api_sifu/logs
+agent/.env
+/agent/__pycache__

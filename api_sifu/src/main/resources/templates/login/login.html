@@ -4,76 +4,70 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Iniciar sesión</title>
-	<style>
-		body {
-			font-family: sans-serif;
-			background-color: #f0f2f5;
-			display: flex;
-			justify-content: center;
-			align-items: center;
-			height: 100vh;
-		}
-
-		.login-container {
-			background-color: white;
-			padding: 2rem;
-			border-radius: 10px;
-			box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-			width: 300px;
-		}
-
-		.login-container h2 {
-			margin-bottom: 1rem;
-			text-align: center;
-		}
-
-		.login-container input[type="text"],
-		.login-container input[type="password"] {
-			width: 100%;
-			padding: 0.5rem;
-			margin-bottom: 1rem;
-			border: 1px solid #ccc;
-			border-radius: 5px;
-		}
-
-		.login-container button {
-			width: 100%;
-			padding: 0.5rem;
-			background-color: #4CAF50;
-			border: none;
-			color: white;
-			border-radius: 5px;
-			font-weight: bold;
-		}
-
-		.message {
-			text-align: center;
-			margin-bottom: 1rem;
-			color: red;
-		}
-
-		.logout-message {
-			color: green;
-		}
-	</style>
+<!--	<style>-->
+<!--	</style>-->
+	<link rel="stylesheet" th:href="@{/assets/css/styles.min.css}" />
+	<link rel="stylesheet" th:href="@{/assets/css/site.css}" />
 </head>
 <body>
 <div class="login-container">
-	<h2>Iniciar sesión</h2>
+	<div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+		 data-sidebar-position="fixed" data-header-position="fixed">
+		<div
+				class="position-relative overflow-hidden text-bg-light min-vh-100 d-flex align-items-center justify-content-center">
+			<div class="d-flex align-items-center justify-content-center w-100">
+				<div class="row justify-content-center w-100">
+					<div class="col-md-8 col-lg-6 col-xxl-3">
+						<div class="card mb-0">
+							<div class="card-body">
+								<a href="./index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
+									<img th:src="@{/assets/images/logos/logo.svg}" alt="">
+								</a>
+								<p class="text-center">SiFu</p>
 
-	<!-- Mensajes de error -->
-	<div class="message" th:if="${param.error}">
-		Credenciales inválidas.
+								<!-- Mensajes de error -->
+								<div class="message" th:if="${param.error}">
+									Credenciales inválidas.
+								</div>
+								<div class="message logout-message" th:if="${param.logout}">
+									Has cerrado sesión exitosamente.
+								</div>
+								<form th:action="@{/login}" method="post">
+									<div class="mb-3">
+										<label for="username" class="form-label">Username</label>
+										<input  type="text" name="username" placeholder="Usuario" class="form-control" id="username" aria-describedby="emailHelp" required>
+									</div>
+									<div class="mb-4">
+										<label for="password" class="form-label">Password</label>
+										<input type="password" name="password" placeholder="Contraseña" class="form-control" id="password" required>
+									</div>
+<!--									<div class="d-flex align-items-center justify-content-between mb-4">-->
+<!--										<div class="form-check">-->
+<!--											<input class="form-check-input primary" type="checkbox" value="" id="flexCheckChecked" checked>-->
+<!--											<label class="form-check-label text-dark" for="flexCheckChecked">-->
+<!--												Remeber this Device-->
+<!--											</label>-->
+<!--										</div>-->
+<!--										<a class="text-primary fw-bold" href="./index.html">Forgot Password ?</a>-->
+<!--									</div>-->
+									<button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</button>
+									<div class="d-flex align-items-center justify-content-center">
+										<a class="badge text-bg-primary me-4" th:href="@{/login/registrar-usuario}">Usuario</a>
+										<a class="badge text-bg-primary " th:href="@{/login/registrar-agricultor}">Agricultor</a>
+									</div>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
-	<div class="message logout-message" th:if="${param.logout}">
-		Has cerrado sesión exitosamente.
-	</div>
-
-	<form th:action="@{/login}" method="post">
-		<input type="text" name="username" placeholder="Usuario" required/>
-		<input type="password" name="password" placeholder="Contraseña" required/>
-		<button type="submit">Entrar</button>
-	</form>
 </div>
+<script th:src="@{/assets/libs/jquery/dist/jquery.min.js}"></script>
+<script
+		th:src="@{/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+<!-- solar icons -->
+<script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 </body>
 </html>
