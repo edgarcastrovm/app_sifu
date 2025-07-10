@@ -6,7 +6,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Registro de Agricultor</title>
+<title>Registro de Cliente</title>
 <link rel="shortcut icon" type="image/png"
 	th:href="@{/assets/images/logos/planta.png}" />
 <link rel="stylesheet" th:href="@{/assets/css/styles.min.css}" />
@@ -28,8 +28,8 @@
 									<img th:src="@{/assets/images/logos/planta.png}" alt=""
 										class="planta"/>
 								</div>
-								<p class="text-center">Registrate como Agricultor en Siembra Futuro</p>
-								<form th:action="@{/site/registrarAgricultor}" method="post" th:object="${registro}">
+								<p class="text-center">Registrate como Cliente en Siembra Futuro</p>
+								<form th:action="@{/site/registrarCliente}" method="post" th:object="${registroC}">
 									<div class="mb-3">
 										<label for="nombre" class="form-label">Nombre</label>
 										<input th:field="*{nombre}" type="text" class="form-control" id="nombre" placeholder="Ingrese nombre" required
@@ -53,7 +53,11 @@
 									<div class="mb-3">
 										<label for="celular" class="form-label">Celular</label> 
 											<input th:field="*{celular}" type="text" class="form-control" placeholder="Ingrese celular" required
-											id="celular" minlength="10" maxlength="10" pattern="^[0-9]{10}$" title="El celular debe tener exactamente 10 dígitos numéricos" aria-describedby="textHelp">
+											id="celular"  minlength="10" maxlength="10" pattern="^[0-9]{10}$" title="El celular debe tener exactamente 10 dígitos numéricos" aria-describedby="textHelp" >
+									</div>
+									<div class="form-check form-switch">
+									  <input th:field="*{entidadSFL}" class="form-check-input" type="checkbox" role="switch" id="entidadSFL" placeholder="Ingrese si corresponde a una entidad sin fines de lucro">
+									  <label for="entidadSFL" class="form-check-label">Entidad Sin Fines de Lucro</label>
 									</div>
 									<div class="mb-3">
 										<label for="alias" class="form-label">Alias</label> 
@@ -66,7 +70,7 @@
 											id="clave" required>
 									</div>
 									<div class="d-flex align-items-center justify-content-center">
-										<button type="submit" class="btn btn-primary">Crear Cuenta Agricultor</button>
+										<button type="submit" class="btn btn-primary">Crear Cuenta Cliente</button>
 									</div>
 									<br>
 									<div class="d-flex align-items-center justify-content-center">

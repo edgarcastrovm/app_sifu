@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro Exitoso</title>
+    <link rel="shortcut icon" type="image/png" th:href="@{/assets/images/logos/planta.png}" />
+    <link rel="stylesheet" th:href="@{/assets/css/styles.min.css}" />
+    <style>
+        .centered {
+            text-align: center;
+            margin-top: 100px;
+        }
+        .centered img {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+        .centered h1 {
+            color: green;
+        }
+        .btn {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="centered">
+        <img th:src="@{/assets/images/logos/planta.png}" alt="Logo" />
+        <h1>¡Registro Exitoso!</h1>
+        <p>Tu cuenta ha sido creada correctamente.</p>
+        <a class="btn btn-primary" th:href="@{/sifu/site/login/login.html}">Iniciar sesión</a>
+    </div>
+
+</body>
+</html>
