@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/site")
 public class SiteController {
 
-	@GetMapping({ "", "/" })
+	@GetMapping("/")
 	public String index() {
 		return "public/index";
 	}
@@ -33,6 +33,18 @@ public class SiteController {
 	@GetMapping("/formulario-usuario")
 	public String formularioUsuario() {
 		return "perfiles/usuarios/formulario-usuario";
+	}
+
+	// Productos tienda
+	@GetMapping("/shop")
+	public String shop() {
+		return "public/productos";
+	}
+
+	// Usuarios
+	@GetMapping("/shop/agricultor")
+	public String agricultores() {
+		return "public/agricultor";
 	}
 
 }

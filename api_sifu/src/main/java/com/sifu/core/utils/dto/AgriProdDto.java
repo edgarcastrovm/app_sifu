@@ -1,6 +1,7 @@
 package com.sifu.core.utils.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.sifu.core.utils.entity.AgriProd;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,21 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AgriProdDto implements Serializable {
     private Integer id;
+    private Integer stock;
     private AgricultorDto agricultor;
     private ProductoDto producto;
+
+    public AgriProdDto(AgriProd entity) {
+        id = entity.getId();
+        stock = entity.getStock().getCantidad();
+        agricultor = new AgricultorDto(entity.getAgricultor());
+        producto = new ProductoDto(entity.getProducto());
+    }
+
+    public AgriProd toEntity() {
+        AgriProd agriProd = new AgriProd();
+        agriProd.setId(id);
+        agriProd.setAgricultor(agricultor.toEntity());
+        return agriProd;
+    }
 }

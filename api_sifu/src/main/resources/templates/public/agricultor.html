@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es" layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+<head>
+    <title>Inicio</title>
+</head>
+<body>
+<div class="row" layout:fragment="content">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card-profile {
+            border: none;
+            border-radius: 1rem;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+        }
+
+        .card-profile:hover {
+            transform: translateY(-5px);
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background-color: #0d6efd22;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #0d6efd;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-header {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .table thead {
+            background-color: #f1f3f5;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .modal-body {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+    </style>
+    <div class="container my-5">
+        <h3 class="mb-4 text-center">🌿 Agricultores Registrados</h3>
+        <div id="agricultoresContainer" class="row g-4"></div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="modalDetalle" tabindex="-1" aria-labelledby="modalDetalleLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDetalleLabel">👤 Detalle del Agricultor</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3" id="detalleAgricultor"></div>
+                    <h6 class="mb-3">🛒 Productos Relacionados</h6>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered align-middle">
+                            <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tablaProductos"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_AGRICULTORES = 'http://localhost:8080/sifu/api/shop/agricultores';
+        const API_PRODUCTOS = 'http://localhost:8080/sifu/api/shop/productos/agricultor'; // Debes crear esta API o adaptarla
+
+        function getIniciales(nombre, apellido) {
+            return `${nombre[0] || ''}${apellido[0] || ''}`.toUpperCase();
+        }
+
+        function crearCardAgricultor(agricultor) {
+            const p = agricultor.persona;
+            const iniciales = getIniciales(p.nombre, p.apellido);
+            return `
+      <div class="col-md-4 col-lg-3">
+        <div class="card card-profile text-center p-3">
+          <div class="avatar mx-auto">${iniciales}</div>
+          <h5 class="card-title mb-1">${p.nombre} ${p.apellido}</h5>
+          <p class="text-muted small mb-2">${p.cedula}</p>
+          <button class="btn btn-outline-primary btn-sm" onclick="verDetalle(${agricultor.id})" data-bs-toggle="modal" data-bs-target="#modalDetalle">
+            Ver Detalle
+          </button>
+        </div>
+      </div>
+    `;
+        }
+
+        function verDetalle(idAgricultor) {
+            fetch(`${API_PRODUCTOS}/${idAgricultor}`)
+                .then(res => res.json())
+                .then(json => {
+                    const productos = json.data;
+                    const p = productos[0]?.agricultor?.persona || {};
+
+                    // Info agricultor
+                    document.getElementById('detalleAgricultor').innerHTML = `
+          <p><strong>Nombre:</strong> ${p.nombre} ${p.apellido}</p>
+          <p><strong>Cédula:</strong> ${p.cedula}</p>
+          <p><strong>Correo:</strong> ${p.correo}</p>
+          <p><strong>Celular:</strong> ${p.celular}</p>
+        `;
+
+                    // Tabla productos
+                    const tabla = document.getElementById('tablaProductos');
+                    if (productos.length === 0) {
+                        tabla.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Sin productos asociados</td></tr>`;
+                    } else {
+                        tabla.innerHTML = productos.map(p => `
+            <tr>
+              <td>${p.producto.nombre}</td>
+              <td>${p.producto.categoriaProd.nombre}</td>
+              <td>$${p.producto.precio.toFixed(2)}</td>
+              <td>${p.stock}</td>
+            </tr>
+          `).join('');
+                    }
+                });
+        }
+
+        // Cargar agricultores
+        fetch(API_AGRICULTORES)
+            .then(res => res.json())
+            .then(json => {
+                const container = document.getElementById('agricultoresContainer');
+                container.innerHTML = json.data.map(crearCardAgricultor).join('');
+            });
+    </script>
+</div>
+</body>
+</html>

@@ -1,20 +1,138 @@
 <!DOCTYPE html>
 <html lang="es" layout:decorate="~{layout}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+>
 <head>
     <title>Inicio</title>
 </head>
 <body>
 <div class="row" layout:fragment="content">
-    <div class="card">
-        <div class="card-title fw-semibold mt-4">
-            <h3 class="text-center">Bienvenido a Siembra Futuro</h3>
-        </div>
-        <div class="card-body text-center">
-            <img th:src="@{/assets/images/backgrounds/landing-page.jpg}" width="95%" style="padding-bottom: 4%" alt="...">
-        </div>
+    <style>
+        .carousel-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            scroll-snap-type: x mandatory;
+        }
+
+        .carousel-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .carousel-scroll::-webkit-scrollbar-thumb {
+            background-color: #ccc;
+            border-radius: 4px;
+        }
+
+        .categoria-card {
+            flex: 0 0 auto;
+            width: 150px;
+            scroll-snap-align: start;
+        }
+
+        .categoria-card img {
+            height: 100px;
+            object-fit: cover;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
+        .item-producto{
+            height: 200px;
+            max-width: 200px;
+            min-width: 200px;
+        }
+        .item-producto .card-body{
+            display: flex;
+            flex-direction: column;
+            padding: 2px;
+        }
+    </style>
+
+    <div class="col-12">
+        <h2 class="mb-1">Categorías de Productos</h2>
+        <div id="carouselCategorias" class="carousel-scroll"></div>
+
+        <hr class="my-1">
+
+        <h3 class="mb-1">Productos por Categoría</h3>
+        <div id="productosContainer"></div>
     </div>
+
+    <script>
+        const imagenesPorDefecto = {
+            "Frutas": "https://www.shutterstock.com/shutterstock/photos/2578716615/display_1500/stock-photo-tropical-fruits-are-fresh-sweet-and-full-of-flavor-juicy-mangoes-pineapples-and-bananas-bring-2578716615.jpg",
+            "Verduras": "https://www.shutterstock.com/shutterstock/photos/2582378303/display_1500/stock-photo-different-fresh-vegetables-in-wicker-basket-isolated-on-white-2582378303.jpg",
+            "Hortalizas": "https://www.shutterstock.com/shutterstock/photos/2260290449/display_1500/stock-photo-farmer-hands-holding-wooden-box-with-different-vegetables-2260290449.jpg",
+            "Legumbres": "https://www.shutterstock.com/shutterstock/photos/2597071861/display_1500/stock-photo-mixed-pulses-for-healthy-and-balanced-diet-in-the-bowls-on-the-table-2597071861.jpg",
+            "Cereales": "https://www.shutterstock.com/shutterstock/photos/2483755205/display_1500/stock-photo-wheat-grains-isolated-barley-pile-dry-cereal-seeds-for-bread-spelta-healthy-organic-food-wheat-2483755205.jpg",
+            "Hierbas Aromáticas": "https://www.shutterstock.com/shutterstock/photos/2337582953/display_1500/stock-photo-different-fresh-potted-herbs-on-windowsill-indoors-2337582953.jpg"
+        };
+
+        function crearCardCategoria({ id, nombre }) {
+            const imgUrl = imagenesPorDefecto[nombre] || 'https://via.placeholder.com/150x100.png?text=Categoria';
+            return `
+              <div class="card categoria-card shadow-sm">
+                <img src="${imgUrl}" class="card-img-top" alt="${nombre}">
+                <div class="card-body text-center p-2">
+                  <h6 class="card-title mb-0">${nombre}</h6>
+                </div>
+              </div>
+            `;
+        }
+        // Crear card para producto
+        function crearCardProducto(prod) {
+            const categoria = prod.categoriaProd?.nombre || 'Sin categoría';
+            const imgUrl = imagenesPorDefecto[categoria] || 'https://via.placeholder.com/300x200.png?text=Producto';
+            return `
+                  <div class="col m-2">
+                    <div class="item-producto card shadow-sm">
+                      <img src="${imgUrl}" class="card-img-top h-50" alt="${prod.nombre}">
+                      <div class="card-body text-center">
+                        <p class="fw-bold">${prod.nombre}</p>
+                        <label class="card-text text-muted">Categoría: ${categoria}</label>
+                        <label class="card-text fw-bold">$${prod.precio.toFixed(2)}</label>
+                      </div>
+                    </div>
+                  </div>
+                `;
+        }
+        // Mostrar productos agrupados por categoría
+        function renderProductosPorCategoria(productos) {
+            const contenedor = document.getElementById('productosContainer');
+
+            // Agrupar productos por categoría
+            const agrupado = {};
+            productos.forEach(p => {
+                const cat = p.categoriaProd?.nombre || 'Sin categoría';
+                if (!agrupado[cat]) agrupado[cat] = [];
+                agrupado[cat].push(p);
+            });
+
+            // Generar HTML
+            contenedor.innerHTML = Object.entries(agrupado).map(([categoria, prods]) => `
+                                  <h5 class="mt-4">${categoria}</h5>
+                                  <div class="row">
+                                    ${prods.map(crearCardProducto).join('')}
+                                  </div>
+                                `).join('');
+        }
+
+
+        // Cargar categorías
+        fetch('http://localhost:8080/sifu/api/shop/categorias')
+            .then(res => res.json())
+            .then(json => {
+                const container = document.getElementById('carouselCategorias');
+                container.innerHTML = json.data.map(crearCardCategoria).join('');
+            });
+
+
+        // Cargar productos
+        fetch('http://localhost:8080/sifu/api/shop/productos')
+            .then(res => res.json())
+            .then(json => renderProductosPorCategoria(json.data));
+    </script>
 </div>
 </body>
 </html>
