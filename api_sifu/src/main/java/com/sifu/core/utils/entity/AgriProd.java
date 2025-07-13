@@ -29,10 +29,14 @@ public class AgriProd {
     @OneToOne(mappedBy = "producto")
     private Stock stock;
 
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String iamge;
+
     @OneToMany(mappedBy = "producto")
     private List<DetalleFact> detalleFact;
 
-    @OneToMany(mappedBy = "producto")
+    @OneToMany(mappedBy = "agriProd")
     private List<DetalleCarrito> detalleCarrito;
     
    

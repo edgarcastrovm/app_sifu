@@ -26,16 +26,20 @@ public class RequestInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        String requestUri = request.getRequestURI();
+        if(requestUri.startsWith("/sifu/assets")) {
+            return true;
+        }
+
         // Generar un UUID como requestId
         String requestId = UUID.randomUUID().toString();
 
         // Agregar el requestId al MDC (Mapped Diagnostic Context) de Log4j2
         ThreadContext.put(REQUEST_ID_MDC_KEY, requestId);
-        // 3. Log de inicio de request
+        // Log de inicio de request
         log.info("Iniciando solicitud - Método: {}, URI: {}",
                 request.getMethod(), request.getRequestURI());
 
-        String requestUri = request.getRequestURI();
 
         if (requestUri.startsWith(Constants.API_PROTECTED)) {
             // Obtener el token del header

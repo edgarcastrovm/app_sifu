@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es" layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+<head>
+    <title>Perfil-Cliente</title>
+</head>
+<body>
+<div class="row" layout:fragment="content">
+
+    <div class="container mt-4">
+        <h2>Productos del Agricultor</h2>
+
+        <table class="table table-bordered table-hover" id="tabla-productos">
+            <thead class="table-primary">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Stock</th>
+                <th>Agricultor</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="productos-body">
+            <!-- JS insertará las filas -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal de Detalles -->
+    <div class="modal fade" id="detalleModal" tabindex="-1" aria-labelledby="detalleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detalleModalLabel">Detalle del Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="detalle-contenido">
+                    <!-- Contenido dinámico -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = `${URL_BASE}/api/shop/agricultores/productos`;
+
+        function cargarProductos() {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(json => {
+                    const productos = json.data;
+                    const tbody = document.getElementById('productos-body');
+                    tbody.innerHTML = ''; // limpiar
+
+                    productos.forEach(p => {
+                        const fila = document.createElement('tr');
+
+                        fila.innerHTML = `
+                        <td>${p.id}</td>
+                        <td>${p.producto.nombre}</td>
+                        <td>${p.producto.categoriaProd.nombre}</td>
+                        <td>${p.producto.precio}</td>
+                        <td>${p.stock}</td>
+                        <td>${p.agricultor.persona.nombre} ${p.agricultor.persona.apellido}</td>
+                        <td>
+                            <button class="btn btn-sm btn-info me-2" onclick="verDetalle(${p.id})">Ver</button>
+                            <button class="btn btn-sm btn-danger" onclick="eliminarProducto(${p.id})">Eliminar</button>
+                        </td>
+                    `;
+                        tbody.appendChild(fila);
+                    });
+                });
+        }
+
+        function verDetalle(id) {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(json => {
+                    const producto = json.data.find(p => p.id === id);
+                    const detalle = `
+                    <ul class="list-group">
+                        <li class="list-group-item"><strong>ID:</strong> ${producto.id}</li>
+                        <li class="list-group-item"><strong>Producto:</strong> ${producto.producto.nombre}</li>
+                        <li class="list-group-item"><strong>Categoría:</strong> ${producto.producto.categoriaProd.nombre}</li>
+                        <li class="list-group-item"><strong>Precio:</strong> $${producto.producto.precio}</li>
+                        <li class="list-group-item"><strong>Stock:</strong> ${producto.stock}</li>
+                        <li class="list-group-item"><strong>Agricultor:</strong> ${producto.agricultor.persona.nombre} ${producto.agricultor.persona.apellido}</li>
+                        <li class="list-group-item"><strong>Correo:</strong> ${producto.agricultor.persona.correo}</li>
+                    </ul>
+                `;
+                    document.getElementById('detalle-contenido').innerHTML = detalle;
+                    new bootstrap.Modal(document.getElementById('detalleModal')).show();
+                });
+        }
+
+        function eliminarProducto(id) {
+            if (!confirm("¿Está seguro que desea eliminar este producto?")) return;
+
+            fetch(`${API_URL}/${id}`, {
+                method: 'DELETE'
+            })
+                .then(res => {
+                    if (res.ok) {
+                        alert("Producto eliminado.");
+                        cargarProductos();
+                    } else {
+                        alert("No se pudo eliminar.");
+                    }
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', cargarProductos);
+    </script>
+</div>
+</body>
+</html>

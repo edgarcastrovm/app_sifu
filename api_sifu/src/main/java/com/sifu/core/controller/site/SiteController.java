@@ -41,10 +41,16 @@ public class SiteController {
 		return "public/productos";
 	}
 
-	// Usuarios
+	// Agricultor
 	@GetMapping("/shop/agricultor")
 	public String agricultores() {
 		return "public/agricultor";
+	}
+
+	// Usuarios
+	@GetMapping("/shop/mi-carrito")
+	public String carrito() {
+		return "cliente/carrito";
 	}
 
 }

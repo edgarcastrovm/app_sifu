@@ -10,5 +10,9 @@ public class IndexController {
     public String index() {
         return "public/index";
     }
+    @GetMapping("/site")
+    public String site() {
+        return "public/index";
+    }
 
 }

@@ -25,7 +25,11 @@ public class DetalleCarrito {
     private Carrito carrito;
 
     @ManyToOne
+    @JoinColumn(name = "agri_prod_id")
+    private AgriProd agriProd;
+
+    @ManyToOne
     @JoinColumn(name = "producto_id")
-    private AgriProd producto;
+    private Producto producto;
 
 }

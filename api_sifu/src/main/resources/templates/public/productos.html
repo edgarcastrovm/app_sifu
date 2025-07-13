@@ -8,7 +8,7 @@
 <body>
 <div class="row" layout:fragment="content">
     <style>
-        .carousel-scroll {
+        .categori-scroll {
             display: flex;
             overflow-x: auto;
             gap: 1rem;
@@ -16,33 +16,43 @@
             scroll-snap-type: x mandatory;
         }
 
-        .carousel-scroll::-webkit-scrollbar {
-            height: 8px;
+        .categori-scroll::-webkit-scrollbar {
+            height: 6px;
         }
 
-        .carousel-scroll::-webkit-scrollbar-thumb {
-            background-color: #ccc;
+        .categori-scroll::-webkit-scrollbar-thumb {
+            background-color: #bbb;
             border-radius: 4px;
         }
 
         .categoria-card {
             flex: 0 0 auto;
-            width: 150px;
+            width: 160px;
             scroll-snap-align: start;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background: white;
         }
 
         .categoria-card img {
+            width: 100%;
             height: 100px;
             object-fit: cover;
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
         }
-        .item-producto{
+
+        .categoria-card .card-body {
+            padding: 0.5rem;
+            text-align: center;
+        }
+
+        .item-producto {
             height: 200px;
             max-width: 200px;
             min-width: 200px;
         }
-        .item-producto .card-body{
+
+        .item-producto .card-body {
             display: flex;
             flex-direction: column;
             padding: 2px;
@@ -51,14 +61,13 @@
 
     <div class="col-12">
         <h2 class="mb-1">Categorías de Productos</h2>
-        <div id="carouselCategorias" class="carousel-scroll"></div>
+        <div class="categori-scroll" id="carouselCategorias"></div>
 
         <hr class="my-1">
 
         <h3 class="mb-1">Productos por Categoría</h3>
         <div id="productosContainer"></div>
     </div>
-
     <script>
         const imagenesPorDefecto = {
             "Frutas": "https://www.shutterstock.com/shutterstock/photos/2578716615/display_1500/stock-photo-tropical-fruits-are-fresh-sweet-and-full-of-flavor-juicy-mangoes-pineapples-and-bananas-bring-2578716615.jpg",
@@ -69,17 +78,46 @@
             "Hierbas Aromáticas": "https://www.shutterstock.com/shutterstock/photos/2337582953/display_1500/stock-photo-different-fresh-potted-herbs-on-windowsill-indoors-2337582953.jpg"
         };
 
-        function crearCardCategoria({ id, nombre }) {
-            const imgUrl = imagenesPorDefecto[nombre] || 'https://via.placeholder.com/150x100.png?text=Categoria';
+        function crearCardCategoria({id, nombre}) {
+            const imgUrl = imagenesPorDefecto[nombre] || 'https://via.placeholder.com/160x100?text=Categoria';
             return `
-              <div class="card categoria-card shadow-sm">
-                <img src="${imgUrl}" class="card-img-top" alt="${nombre}">
-                <div class="card-body text-center p-2">
-                  <h6 class="card-title mb-0">${nombre}</h6>
+                <div class="categoria-card">
+                  <img src="${imgUrl}" alt="${nombre}">
+                  <div class="card-body">
+                    <h6 class="mb-0">${nombre}</h6>
+                  </div>
                 </div>
-              </div>
-            `;
+              `;
         }
+
+        // Agregar al carrito
+        function agregarItem(id) {
+            producto = {
+                "id": id
+            }
+            fetch(`${URL_BASE}/api/shop/add-item-cart`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(producto)
+                }
+            ).then(async res => {
+                const data = await res.json();
+
+                if (!res.ok) {
+                    // Mostrar mensaje de error personalizado
+                    alert(`Error: ${data.msg}`);
+                    throw new Error(data.msg);
+                }
+                // Si existe el mensaje o damos uno por defecto
+                alert(data.msg || "Agregado correctamente");
+            }).catch(err => {
+                console.error("Error al agregar al carrito:", err);
+            });
+        }
+
         // Crear card para producto
         function crearCardProducto(prod) {
             const categoria = prod.categoriaProd?.nombre || 'Sin categoría';
@@ -92,11 +130,15 @@
                         <p class="fw-bold">${prod.nombre}</p>
                         <label class="card-text text-muted">Categoría: ${categoria}</label>
                         <label class="card-text fw-bold">$${prod.precio.toFixed(2)}</label>
+                        <p>
+                        <button onclick="agregarItem(${prod.id})" type="button" class="btn btn-primary btn-sm"><i class="ti ti-shopping-cart-plus fs-6"></i></button>
+                        </p>
                       </div>
                     </div>
                   </div>
                 `;
         }
+
         // Mostrar productos agrupados por categoría
         function renderProductosPorCategoria(productos) {
             const contenedor = document.getElementById('productosContainer');
@@ -118,15 +160,15 @@
                                 `).join('');
         }
 
-
         // Cargar categorías
         fetch('http://localhost:8080/sifu/api/shop/categorias')
             .then(res => res.json())
             .then(json => {
                 const container = document.getElementById('carouselCategorias');
-                container.innerHTML = json.data.map(crearCardCategoria).join('');
+                container.innerHTML = json.data.map(item => {
+                    return crearCardCategoria({id: item.id, nombre: item.nombre});
+                }).join('');
             });
-
 
         // Cargar productos
         fetch('http://localhost:8080/sifu/api/shop/productos')

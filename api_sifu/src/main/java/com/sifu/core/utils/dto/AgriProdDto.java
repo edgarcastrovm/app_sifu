@@ -23,7 +23,11 @@ public class AgriProdDto implements Serializable {
 
     public AgriProdDto(AgriProd entity) {
         id = entity.getId();
-        stock = entity.getStock().getCantidad();
+        if (entity.getStock() != null) {
+            stock = entity.getStock().getCantidad();
+        }else {
+            stock = 0;
+        }
         agricultor = new AgricultorDto(entity.getAgricultor());
         producto = new ProductoDto(entity.getProducto());
     }

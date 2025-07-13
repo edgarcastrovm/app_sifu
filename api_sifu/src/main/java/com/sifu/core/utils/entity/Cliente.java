@@ -1,6 +1,7 @@
 package com.sifu.core.utils.entity;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,15 +18,17 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
-	private boolean entidadSFL;
+	private Boolean entidadSFL;
 	
 	@OneToOne
     @JoinColumn(name = "persona_id")
     private Persona persona;
 
 	@OneToMany(mappedBy = "cliente")
+    @JsonIgnore
     private List<Factura> factura;
 
     @OneToMany(mappedBy = "cliente")
+    @JsonIgnore
     private List<Carrito> carrito;
 }

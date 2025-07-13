@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es" layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+<head>
+    <title>Perfil-Cliente</title>
+</head>
+<body>
+<div class="row" layout:fragment="content">
+    <div class="card p-4">
+        <form id="formAgriProd">
+            <div class="mb-3">
+                <label for="productoSelect" class="form-label">Producto</label>
+                <select id="productoSelect" class="form-select" name="productoId" required>
+                    <option value="">-- Selecciona un producto existente --</option>
+                </select>
+            </div>
+            <div class="card">
+                <div class="card-title">
+                    <a class="btn btn-sm btn-info" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        Nuevo Producto (si no existe)
+                    </a>
+                </div>
+
+                <div class="collapse" id="collapseExample">
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="nuevoProducto" class="form-label">Producto</label>
+                            <input type="text" id="nuevoProducto" class="form-control" placeholder="Nombre nuevo producto">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="categoriaSelect" class="form-label">Categoría</label>
+                            <select id="categoriaSelect" class="form-select" name="categoriaId" required>
+                                <option value="">-- Selecciona una categoria --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio</label>
+                            <input type="number" step="0.01" id="precio" class="form-control"
+                                   min="1" placeholder="Precio del producto">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="stock" class="form-label">Stock</label>
+                <input type="number" id="stock" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="imagen" class="form-label">Imagen</label>
+                <input type="file" id="imagen" accept="image/*" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+
+        <div id="mensaje" class="mt-3"></div>
+    </div>
+
+    <script>
+        const apiProductos = `${URL_BASE}/api/shop/productos`;
+        const apiCategorias = `${URL_BASE}/api/shop/categorias`;
+        const apiGuardar = `${URL_BASE}/api/shop/agri-productos`;
+        const productoSelect = document.getElementById("productoSelect");
+        const categoriaSelect = document.getElementById("categoriaSelect");
+
+        // Cargar productos en el combo
+        fetch(apiProductos)
+            .then(res => res.json())
+            .then(json => {
+                json.data.forEach(prod => {
+                    const opt = document.createElement("option");
+                    opt.value = prod.id;
+                    opt.text = `${prod.nombre} - $${prod.precio}`;
+                    opt.dataset.precio = prod.precio;
+                    opt.dataset.categoria = prod.categoriaProd?.nombre || "Sin categoría";
+                    opt.dataset.categoriaId = prod.categoriaProd?.id || 0;
+                    productoSelect.appendChild(opt);
+                });
+            });
+        // Cargar categorias en el combo
+        fetch(apiCategorias)
+            .then(res => res.json())
+            .then(json => {
+                json.data.forEach(cat => {
+                    const opt = document.createElement("option");
+                    opt.value = cat.id;
+                    opt.text = cat.nombre;
+                    categoriaSelect.appendChild(opt);
+                });
+            });
+
+        // Escuchar selección para precargar valores
+        productoSelect.addEventListener("change", (e) => {
+            const selected = productoSelect.selectedOptions[0];
+            if (selected?.value) {
+                document.getElementById("nuevoProducto").value = selected.text.split(" - ")[0];
+                document.getElementById("precio").value = selected.dataset.precio;
+                document.getElementById("categoriaSelect").value = selected.dataset.categoriaId;
+            } else {
+                document.getElementById("nuevoProducto").value = "";
+                document.getElementById("precio").value = "";
+                document.getElementById("categoriaSelect").value = "";
+            }
+        });
+
+        // Convertir imagen a base64
+        function toBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Enviar formulario
+        document.getElementById("formAgriProd").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const file = document.getElementById("imagen").files[0];
+            if (!file) return alert("Seleccione una imagen");
+
+            const iamge = await toBase64(file);
+
+            const productoId = productoSelect.value;
+            const nombre = document.getElementById("nuevoProducto").value;
+            const precio = parseFloat(document.getElementById("precio").value);
+            const categoriaNombre = document.getElementById("categoriaProd").value;
+            const stock = parseInt(document.getElementById("stock").value);
+
+            const producto = productoId
+                ? {id: parseInt(productoId)}
+                : {
+                    nombre,
+                    precio,
+                    categoriaProd: {nombre: categoriaNombre}
+                };
+
+            const body = {
+                stock,
+                iamge,
+                producto
+            };
+
+            fetch(apiGuardar, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("mensaje").innerHTML = `<div class="alert alert-success">Producto registrado</div>`;
+                    this.reset();
+                })
+                .catch(err => {
+                    document.getElementById("mensaje").innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
+                });
+        });
+    </script>
+
+</div>
+</body>
+</html>
