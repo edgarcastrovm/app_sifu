@@ -3,6 +3,11 @@
 	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 	<div th:fragment="sideMenu">
+		<style>
+			.collapse.first-level{
+				background-color: rgba(200,200,200,.2);
+			}
+		</style>
 		<nav class="sidebar-nav scroll-sidebar" data-simplebar="">
 			<ul id="sidebarnav">
 				<!-- ---------------------------------- -->
@@ -16,7 +21,7 @@
 							</span> <span class="hide-menu">Tienda</span>
 						</div>
 					</a>
-					<ul aria-expanded="false" class="collapse first-level">
+					<ul aria-expanded="true" class="collapse first-level">
 						<li class="sidebar-item">
 							<a class="sidebar-link justify-content-between" th:href="@{/site/shop}">
 								<div class="d-flex align-items-center gap-3">
@@ -45,7 +50,7 @@
 				<!-- ---------------------------------- -->
 				<li class="sidebar-item" sec:authorize="isAuthenticated()">
 					<a class="sidebar-link justify-content-between has-arrow"
-					   href="javascript:void(0)" aria-expanded="false">
+					   href="javascript:void(0)" aria-expanded="true">
 						<div class="d-flex align-items-center gap-3">
 							<span class="d-flex"> <i class="ti ti-user"></i>
 							</span> <span class="hide-menu">Reportes</span>

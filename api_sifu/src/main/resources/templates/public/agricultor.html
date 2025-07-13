@@ -8,13 +8,8 @@
 <body>
 <div class="row" layout:fragment="content">
     <style>
-        body {
-            background-color: #f8f9fa;
-        }
-
         .card-profile {
             border: none;
-            border-radius: 1rem;
             background-color: #ffffff;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             transition: transform 0.2s ease;
@@ -25,8 +20,8 @@
         }
 
         .avatar {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             background-color: #0d6efd22;
             border-radius: 50%;
             display: flex;
@@ -38,22 +33,16 @@
             margin-bottom: 0.5rem;
         }
 
-        .modal-header {
-            background-color: #0d6efd;
-            color: white;
-        }
-
-        .table thead {
-            background-color: #f1f3f5;
-        }
-
         .table tbody tr:hover {
             background-color: #f8f9fa;
         }
 
-        .modal-body {
-            max-height: 60vh;
+        #tbl-content {
+            max-height: 30vh;
             overflow-y: auto;
+        }
+        .modal-content{
+            border-radius: .2rem;
         }
     </style>
     <div class="container my-5">
@@ -66,25 +55,36 @@
         <div class="modal-dialog modal-lg modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalDetalleLabel">👤 Detalle del Agricultor</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
                             aria-label="Cerrar"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3" id="detalleAgricultor"></div>
-                    <h6 class="mb-3">🛒 Productos Relacionados</h6>
-                    <div class="table-responsive">
-                        <table class="table table-hover table-bordered align-middle">
-                            <thead>
-                            <tr>
-                                <th>Producto</th>
-                                <th>Categoría</th>
-                                <th>Precio</th>
-                                <th>Stock</th>
-                            </tr>
-                            </thead>
-                            <tbody id="tablaProductos"></tbody>
-                        </table>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="modal-title mb-3 text-center" id="modalDetalleLabel">
+                                <div class="avatar mx-auto">👤</div>
+                                Detalle del Agricultor
+                            </h5>
+                            <div class="card-header" id="detalleAgricultor">
+                            </div>
+
+                            <h6 class="card-title m-3"> <i class="ti ti-shopping-cart fs-4"></i>
+                                Productos Relacionados
+                            </h6>
+                            <div id="tbl-content" class="table-responsive">
+                                <table class="table table-hover table-bordered align-middle">
+                                    <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Categoría</th>
+                                        <th>Precio</th>
+                                        <th>Stock</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="tablaProductos"></tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -103,17 +103,16 @@
             const p = agricultor.persona;
             const iniciales = getIniciales(p.nombre, p.apellido);
             return `
-      <div class="col-md-4 col-lg-3">
-        <div class="card card-profile text-center p-3">
-          <div class="avatar mx-auto">${iniciales}</div>
-          <h5 class="card-title mb-1">${p.nombre} ${p.apellido}</h5>
-          <p class="text-muted small mb-2">${p.cedula}</p>
-          <button class="btn btn-outline-primary btn-sm" onclick="verDetalle(${agricultor.id})" data-bs-toggle="modal" data-bs-target="#modalDetalle">
-            Ver Detalle
-          </button>
-        </div>
-      </div>
-    `;
+              <div class="col-md-4 col-lg-3">
+                <div class="card card-profile text-center p-3">
+                  <div class="avatar mx-auto">${iniciales}</div>
+                  <h5 class="card-title mb-1">${p.nombre} ${p.apellido}</h5>
+                  <button class="btn badge bg-info" onclick="verDetalle(${agricultor.id})" data-bs-toggle="modal" data-bs-target="#modalDetalle">
+                    Ver Detalle
+                  </button>
+                </div>
+              </div>
+            `;
         }
 
         function verDetalle(idAgricultor) {
@@ -125,11 +124,9 @@
 
                     // Info agricultor
                     document.getElementById('detalleAgricultor').innerHTML = `
-          <p><strong>Nombre:</strong> ${p.nombre} ${p.apellido}</p>
-          <p><strong>Cédula:</strong> ${p.cedula}</p>
-          <p><strong>Correo:</strong> ${p.correo}</p>
-          <p><strong>Celular:</strong> ${p.celular}</p>
-        `;
+                      <p><strong>Nombre:</strong> ${p.nombre} ${p.apellido}</p>
+                      <p><strong>Correo:</strong> ${p.correo}</p>
+                    `;
 
                     // Tabla productos
                     const tabla = document.getElementById('tablaProductos');
@@ -137,13 +134,13 @@
                         tabla.innerHTML = `<tr><td colspan="4" class="text-center text-muted">Sin productos asociados</td></tr>`;
                     } else {
                         tabla.innerHTML = productos.map(p => `
-            <tr>
-              <td>${p.producto.nombre}</td>
-              <td>${p.producto.categoriaProd.nombre}</td>
-              <td>$${p.producto.precio.toFixed(2)}</td>
-              <td>${p.stock}</td>
-            </tr>
-          `).join('');
+                            <tr>
+                              <td>${p.producto.nombre}</td>
+                              <td>${p.producto.categoriaProd.nombre}</td>
+                              <td>$${p.producto.precio.toFixed(2)}</td>
+                              <td>${p.stock}</td>
+                            </tr>
+                          `).join('');
                     }
                 });
         }
