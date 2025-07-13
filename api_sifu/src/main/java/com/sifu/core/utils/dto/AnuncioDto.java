@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 public class AnuncioDto implements Serializable {
     private Integer id;
     private String descripcion;
+    private String estado;
     private LocalDateTime fechaCreacion;
     private AgricultorDto agricultor;
 }
