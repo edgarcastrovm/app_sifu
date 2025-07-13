@@ -14,7 +14,8 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CrearClienteDto {
 	
-	private String nombre;
+	
+	 private String nombre;
 	 private String apellido;
 	 private String correo;
 	 private String cedula;
@@ -28,6 +29,7 @@ public class CrearClienteDto {
 	 
 	 
 	 public CrearClienteDto(Object entity) {
+		 	
 	        nombre = null;
 	        apellido = null;
 	        correo = null;

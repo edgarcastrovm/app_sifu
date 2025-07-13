@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CrearAgricultorDto {
 
+	 private Integer id;
 	 private String nombre;
 	 private String apellido;
 	 private String correo;
