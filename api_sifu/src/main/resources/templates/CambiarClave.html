@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cambiar de Clave</title>
+    <link rel="shortcut icon" type="image/png" th:href="@{/assets/images/logos/planta.png}" />
+    <link rel="stylesheet" th:href="@{/assets/css/styles.min.css}" />
+</head>
+<body>
+<div class="page-wrapper" id="main-wrapper" data-layout="vertical"
+     data-navbarbg="skin6" data-sidebartype="full"
+     data-sidebar-position="fixed" data-header-position="fixed">
+
+    <div class="position-relative overflow-hidden text-bg-light min-vh-100 d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center justify-content-center w-100">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8 col-lg-6 col-xxl-3">
+                    <div class="card mb-0">
+                        <div class="card-body">
+                            <div class="contenedor1 text-center">
+                                <img th:src="@{/assets/images/logos/planta.png}" alt="Logo" class="planta" style="width: 80px;" />
+                            </div>
+
+                            <div class="container mt-4">
+                                <h1 class="text-center mb-4">Cambiar de Clave</h1>
+
+                                <!-- Formulario -->
+                                <form th:action="@{/site/cambiarClave}" th:object="${usuario}" method="post">
+
+                                    <div class="mb-3">
+                                        <label for="alias" class="form-label">Usuario</label>
+                                        <input type="text" readonly class="form-control-plaintext" id="alias" th:field="*{alias}">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="claveActual" class="form-label">Clave Actual</label>
+                                        <input type="password" class="form-control" id="claveActual" name="claveActual" placeholder="Clave actual" required>
+                                    </div>
+
+                                    <!-- Mostrar mensaje de error -->
+                                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                                    <div class="mb-3">
+                                        <label for="nuevaClave" class="form-label">Clave Nueva</label>
+                                        <input type="password" class="form-control" id="nuevaClave" name="nuevaClave" placeholder="Nueva clave" required>
+                                    </div>
+
+                                    <!-- Mensaje de éxito -->
+                                    <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+
+                                    <div class="d-flex justify-content-center mt-4">
+                                        <button type="submit" class="btn btn-primary">Cambiar Clave</button>
+                                    </div>
+
+                                </form>
+                                <!-- Fin del formulario -->
+
+                            </div> <!-- container -->
+                        </div> <!-- card-body -->
+                    </div> <!-- card -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

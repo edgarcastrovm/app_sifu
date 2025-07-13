@@ -17,7 +17,7 @@ public class Cliente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
-	private boolean entidadSFL;
+	private Boolean entidadSFL;
 	
 	@OneToOne
     @JoinColumn(name = "persona_id")

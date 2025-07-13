@@ -16,6 +16,6 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ClienteDto implements Serializable {
     private Integer id;
-    private boolean entidadSFL;
+    private Boolean entidadSFL;
     private PersonaDto persona;
 }

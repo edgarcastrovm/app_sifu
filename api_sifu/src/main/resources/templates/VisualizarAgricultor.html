@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Cuenta de Agricultor</title>
+	<link rel="shortcut icon" type="image/png"
+		th:href="@{/assets/images/logos/planta.png}" />
+	
+	<link rel="stylesheet" th:href="@{/assets/css/styles.min.css}" />
+	
+	<script>
+        function habilitarEdicion() {
+            const campos = document.querySelectorAll(".form-control");
+            campos.forEach(campo => campo.removeAttribute("readonly"));      
+            document.getElementById("btnGuardar").disabled = false;
+            document.getElementById("btnEditar").disabled = true;
+        }
+    </script>
+</head>
+
+<body>
+	<div class="page-wrapper" id="main-wrapper" data-layout="vertical"
+			data-navbarbg="skin6" data-sidebartype="full"
+			data-sidebar-position="fixed" data-header-position="fixed">
+			<div
+				class="position-relative overflow-hidden text-bg-light min-vh-100 d-flex align-items-center justify-content-center">
+				<div class="d-flex align-items-center justify-content-center w-100">
+					<div class="row justify-content-center w-100">
+						<div class="col-md-8 col-lg-6 col-xxl-3">
+							<div class="card mb-0">
+								<div class="card-body">
+									<div class="contenedor1">
+										<img th:src="@{/assets/images/logos/planta.png}" alt=""
+											class="planta"/>
+									</div>
+									    <div class="container mt-4">
+									   		<div class="text-center mt-4">
+									        	<h2>Información del Agricultor</h2>
+									        </div>
+									
+									        <form th:action="@{'/site/verAgricultor/' + ${agricultorDto.id}}" th:object="${agricultorDto}" method="post">
+									            <input type="hidden" th:field="*{id}" />
+									
+									            <div class="mb-3">
+									                <label>Nombre</label>
+									                <input type="text" class="form-control" th:field="*{nombre}" readonly required>
+													<div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+						
+									            </div>
+									
+									            <div class="mb-3">
+									                <label>Apellido</label>
+									                <input type="text" class="form-control" th:field="*{apellido}" readonly required>
+									                <div class="text-danger" th:if="${#fields.hasErrors('apellido')}" th:errors="*{apellido}"></div>
+									            </div>
+									
+									           <div class="mb-3">
+									                <label>Cédula</label>
+									                <input type="text" class="form-control" th:field="*{cedula}" readonly required minlength="10" maxlength="10" pattern="^[0-9]{10}$" title="La cédula debe tener exactamente 10 dígitos numéricos" aria-describedby="textHelp">
+									                <div class="text-danger" th:if="${#fields.hasErrors('cedula')}" th:errors="*{cedula}"></div>
+									            </div>
+									
+									            <div class="mb-3">
+									                <label>Correo</label>
+									                <input type="email" class="form-control" th:field="*{correo}" readonly required>
+									                <div class="text-danger" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></div>
+									            </div>
+									
+									            <div class="mb-3">
+									                <label>Celular</label>
+									                <input type="text" class="form-control" th:field="*{celular}" readonly required minlength="10" maxlength="10" pattern="^[0-9]{10}$" title="El celular debe tener exactamente 10 dígitos numéricos" aria-describedby="textHelp">
+									                <div class="text-danger" th:if="${#fields.hasErrors('celular')}" th:errors="*{celular}"></div>
+									            </div>	
+									            
+									            
+									            				
+									            <div class="text-center mt-4">
+									                <button type="button" id="btnEditar" class="btn btn-warning" onclick="habilitarEdicion()" title="Editar">
+    													<iconify-icon icon="mdi:pencil" width="24" height="24"></iconify-icon>
+													</button>
+									                <button type="submit" id="btnGuardar" class="btn btn-success" disabled>
+									                    <iconify-icon icon="mdi:content-save" width="22" height="22"></iconify-icon>
+									                </button>
+									                <a th:href="@{/site/}" class="btn btn-secondary">Volver</a>
+									            </div>
+									        </form>
+    									</div>
+	<script th:src="@{/assets/libs/jquery/dist/jquery.min.js}"></script>
+	<script
+		th:src="@{/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
+	<!-- solar icons -->
+	<script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+</body>
+
+</html>
