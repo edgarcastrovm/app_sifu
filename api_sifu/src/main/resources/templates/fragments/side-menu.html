@@ -119,6 +119,16 @@
 								</div>
 							</a>
 						</li>
+						<li class="sidebar-item" sec:authorize="hasAuthority('AGRICULTOR')">
+							<a class="sidebar-link justify-content-between" th:href="@{/agricultor/anuncios}">
+								<div class="d-flex align-items-center gap-3">
+									<div class="round-16 d-flex align-items-center justify-content-center">
+										<i class="ti ti-folder-plus fs-4"></i>
+									</div>
+									<span class="hide-menu">Anuncios</span>
+								</div>
+							</a>
+						</li>
 					</ul>
 				</li>
 				

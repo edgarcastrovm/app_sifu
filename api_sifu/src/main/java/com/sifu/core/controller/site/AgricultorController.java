@@ -3,8 +3,9 @@ package com.sifu.core.controller.site;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +25,7 @@ import com.sifu.core.utils.entity.Usuario;
 @Controller
 @RequestMapping("/agricultor")
 public class AgricultorController {
+    private static final Logger log = LogManager.getLogger(AgricultorController.class);
 	
 	@Autowired 
 	private AnuncioService anuncioService;
@@ -40,8 +42,13 @@ public class AgricultorController {
         return "agricultor/ver-productos";
     }
 
-	@GetMapping("/crearAnuncio/{id}")
-	public String mostrarFormulario(@PathVariable Integer id,Model model) {
+	@GetMapping("/anuncios")
+	public String mostrarFormulario(Model model, Authentication authentication) {
+        CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
+        Usuario usuario = userDetails.getUsuario();
+        Integer id = usuario.getPersona().getAgricultor().getId();
+        log.info(String.format("Agricultor id: %d", id));
+
 		Anuncio anuncio = new Anuncio();
 	    Agricultor agricultor = agricultorService.obtenerPorId(id);
 	    List<Anuncio> anuncios = anuncioService.obtenerAnunciosPorAgricultor(agricultor.getId());
@@ -50,7 +57,7 @@ public class AgricultorController {
 	    model.addAttribute("agricultor", agricultor);
 	    model.addAttribute("anunciosGuardados", anuncios); 
 	    model.addAttribute("modoEdicion", false);
-	    return "agricultores/anuncios"; 
+	    return "agricultor/anuncios";
 	}
 	
 	@GetMapping("/validarAgricultor")
