@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es" layout:decorate="~{layout}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+<head>
+    <title>Perfil-Agricultor</title>
+</head>
+<body>
+<div class="row" layout:fragment="content">
+    <div class="card mb-0">
+        <div class="card-body">
+            <div class="contenedor1">
+                <img th:src="@{/assets/images/logos/planta.png}" alt=""
+                     class="planta"/>
+            </div>
+            <div class="container mt-4">
+                <div class="text-center mt-4">
+                    <h2>Información del Agricultor</h2>
+                </div>
+
+                <form th:action="@{'/site/verAgricultor/' + ${agricultorDto.id}}" th:object="${agricultorDto}"
+                      method="post">
+                    <input type="hidden" th:field="*{id}"/>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Nombre</label>
+                        <div class="col-8">
+                            <input type="text" class="form-control" th:field="*{nombre}" readonly required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Apellido</label>
+                        <div class="col-8">
+                            <input type="text" class="form-control" th:field="*{apellido}" readonly required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('apellido')}"
+                                 th:errors="*{apellido}"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Cédula</label>
+                        <div class="col-8">
+                            <input type="text" class="form-control" th:field="*{cedula}" readonly required
+                                   minlength="10"
+                                   maxlength="10" pattern="^[0-9]{10}$"
+                                   title="La cédula debe tener exactamente 10 dígitos numéricos"
+                                   aria-describedby="textHelp">
+                            <div class="text-danger" th:if="${#fields.hasErrors('cedula')}" th:errors="*{cedula}"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Correo</label>
+                        <div class="col-8">
+                            <input type="email" class="form-control" th:field="*{correo}" readonly required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3 row">
+                        <label class="col-sm-2 col-form-label">Celular</label>
+                        <div class="col-8">
+                            <input type="text" class="form-control" th:field="*{celular}" readonly required
+                                   minlength="10"
+                                   maxlength="10" pattern="^[0-9]{10}$"
+                                   title="El celular debe tener exactamente 10 dígitos numéricos"
+                                   aria-describedby="textHelp">
+                            <div class="text-danger" th:if="${#fields.hasErrors('celular')}"
+                                 th:errors="*{celular}"></div>
+                        </div>
+                    </div>
+
+
+                    <div class="text-center mt-4">
+                        <button type="button" id="btnEditar" class="btn btn-warning" onclick="habilitarEdicion()"
+                                title="Editar">
+                            <iconify-icon icon="mdi:pencil" width="24" height="24"></iconify-icon>
+                        </button>
+                        <button type="submit" id="btnGuardar" class="btn btn-success" disabled>
+                            <iconify-icon icon="mdi:content-save" width="22" height="22"></iconify-icon>
+                        </button>
+                        <a th:href="@{/site/}" class="btn btn-secondary">Volver</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function habilitarEdicion() {
+            const campos = document.querySelectorAll(".form-control");
+            campos.forEach(campo => campo.removeAttribute("readonly"));
+            document.getElementById("btnGuardar").disabled = false;
+            document.getElementById("btnEditar").disabled = true;
+        }
+    </script>
+</div>
+
+</body>
+
+</html>

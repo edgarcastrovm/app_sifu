@@ -90,6 +90,34 @@
               `;
         }
 
+        // Agregar al carrito
+        function agregarItem(id) {
+            producto = {
+                "id": id
+            }
+            fetch(`${URL_BASE}/api/shop/add-item-cart`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(producto)
+                }
+            ).then(async res => {
+                const data = await res.json();
+
+                if (!res.ok) {
+                    // Mostrar mensaje de error personalizado
+                    alert(`Error: ${data.msg}`);
+                    throw new Error(data.msg);
+                }
+                // Si existe el mensaje o damos uno por defecto
+                alert(data.msg || "Agregado correctamente");
+            }).catch(err => {
+                console.error("Error al agregar al carrito:", err);
+            });
+        }
+
         // Crear card para producto
         function crearCardProducto(prod) {
             const categoria = prod.categoriaProd?.nombre || 'Sin categoría';
@@ -102,6 +130,9 @@
                         <p class="fw-bold">${prod.nombre}</p>
                         <label class="card-text text-muted">Categoría: ${categoria}</label>
                         <label class="card-text fw-bold">$${prod.precio.toFixed(2)}</label>
+                        <p>
+                        <button onclick="agregarItem(${prod.id})" type="button" class="btn btn-primary btn-sm"><i class="ti ti-shopping-cart-plus fs-6"></i></button>
+                        </p>
                       </div>
                     </div>
                   </div>

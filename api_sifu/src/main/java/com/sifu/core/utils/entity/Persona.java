@@ -1,5 +1,6 @@
 package com.sifu.core.utils.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -36,12 +37,15 @@ public class Persona {
 
 
     @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Usuario usuario;
 
     @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Cliente cliente;
 
     @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Agricultor agricultor;
 
 }

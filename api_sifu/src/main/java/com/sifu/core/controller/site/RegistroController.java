@@ -1,19 +1,8 @@
 package com.sifu.core.controller.site;
 
 
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import com.sifu.core.repo.AgricultorRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sifu.core.service.AgricultorService;
 import com.sifu.core.service.ClienteService;
 import com.sifu.core.service.PersonaService;
@@ -25,58 +14,72 @@ import com.sifu.core.utils.dto.dominio.CrearClienteDto;
 import com.sifu.core.utils.entity.Agricultor;
 import com.sifu.core.utils.entity.Cliente;
 import com.sifu.core.utils.entity.Persona;
-import com.sifu.core.utils.entity.Rol;
 import com.sifu.core.utils.entity.Usuario;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 
 @Controller
 @RequestMapping("/site")
 public class RegistroController {
 
-	@Autowired
+    private static final Logger log = LogManager.getLogger(RegistroController.class);
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private AgricultorService agricultorService;
-	
-	@Autowired
+
+    @Autowired
     private PersonaService personaService;
-	
-	@Autowired
-	private UsuarioService usuarioService;
-	
-	@Autowired
-	private ClienteService clienteService;
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
-	
-	@GetMapping("/registrarAgricultor")
-	public String mostrarFormulario(Model model) {
-		model.addAttribute("registro", new CrearAgricultorDto());
-	    return "login/registrar-agricultor"; 
-	}
-	@GetMapping("/registroExitoso")
-	public String mostrarRegistroExitoso() {
-	    return "exito";
-	}
-	@GetMapping("/registrarCliente")
-	public String mostrarFormularioCliente(Model model) {
-		model.addAttribute("registroC", new CrearClienteDto());
-	    return "login/registrar-cliente"; 
-	}
-		
+
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private ClienteService clienteService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+
+    @GetMapping("/registrarAgricultor")
+    public String mostrarFormulario(Model model) {
+        model.addAttribute("registro", new CrearAgricultorDto());
+        return "login/registrar-agricultor";
+    }
+
+    @GetMapping("/registroExitoso")
+    public String mostrarRegistroExitoso() {
+        return "exito";
+    }
+
+    @GetMapping("/registrarCliente")
+    public String mostrarFormularioCliente(Model model) {
+        model.addAttribute("registroC", new CrearClienteDto());
+        return "login/registrar-cliente";
+    }
+
     @PostMapping("/registrarAgricultor")
-	public String registrarAgricultor(CrearAgricultorDto registro, Model model) {
-		agricultorService.crearAgricultor(registro);
+    public String registrarAgricultor(CrearAgricultorDto registro, Model model) {
+        agricultorService.crearAgricultor(registro);
         return "redirect:/site/registroExitoso";
     }
+
     @PostMapping("/registrarCliente")
-	public String registrarCliente(CrearClienteDto registroC, Model model) {
-    	clienteService.crearCliente(registroC);
+    public String registrarCliente(CrearClienteDto registroC, Model model) {
+        clienteService.crearCliente(registroC);
         return "redirect:/site/registroExitoso";
     }
-    
+
     @GetMapping("/verCliente/{id}")
     public String verCliente(@PathVariable Integer id, Model model) {
         Cliente cliente = clienteService.obtenerPorId(id);
@@ -95,20 +98,21 @@ public class RegistroController {
         dto.setEntidadSFL(cliente.getEntidadSFL());
 
         dto.setId(cliente.getId());
-       // model.addAttribute("cliente", cliente.getId());
+        // model.addAttribute("cliente", cliente.getId());
         model.addAttribute("clienteDto", dto);
 
-        
-        return "VisualizarCliente";
+
+        return "/cliente/VisualizarCliente";
     }
+
     @GetMapping("/verAgricultor/{id}")
     public String verAgricultor(@PathVariable Integer id, Model model) {
-    	
-    	Agricultor agricultor = agricultorService.obtenerPorId(id);
+
+        Agricultor agricultor = agricultorService.obtenerPorId(id);
         if (agricultor == null) {
             return "redirect:/sifu/site";
         }
-        
+
         CrearAgricultorDto dto = new CrearAgricultorDto();
         Persona persona = agricultor.getPersona();
 
@@ -120,18 +124,20 @@ public class RegistroController {
 
         dto.setId(agricultor.getId());
         model.addAttribute("agricultorDto", dto);
-        
-        return "VisualizarAgricultor";
+
+        return "/agricultor/VisualizarAgricultor";
     }
-    
+
     @GetMapping("/perfil")
-    public String redirigirSegunRol(Authentication authentication) {
-    	
+    public String redirigirSegunRol(Authentication authentication) throws JsonProcessingException {
+
         CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
         Usuario usuario = userDetails.getUsuario();
         String rol = usuario.getRol().getNombre();
-
         Integer idPersona = usuario.getPersona().getId();
+        log.info("Usuario logueago: {}", objectMapper.writeValueAsString(usuario));
+        log.info("Rol logueago:'{}'", userDetails.getAuthorities());
+        log.info("Rol logueago:'{}'", rol);
 
         if ("AGRICULTOR".equalsIgnoreCase(rol)) {
             Optional<Agricultor> agricultorOpt = agricultorService.findByPersonaId(idPersona);
@@ -142,54 +148,56 @@ public class RegistroController {
 
         if ("CLIENTE".equalsIgnoreCase(rol)) {
             Optional<Cliente> clienteOpt = clienteService.findByPersonaId(idPersona);
+            log.info("Cliente logueago: {}", objectMapper.writeValueAsString(clienteOpt.get()));
             if (clienteOpt.isPresent()) {
                 return "redirect:/site/verCliente/" + clienteOpt.get().getId();
             }
         }
         return "redirect:/site";
     }
-    
+
     @PostMapping("/verCliente/{id}")
     public String actualizarCliente(@PathVariable Integer id, @ModelAttribute("clienteDto") ActualizarClienteDto dto, Model model) {
         clienteService.actualizarCliente(id, dto);
-        
-        return "redirect:/site/verCliente/" + id;
+
+        return "redirect:/site/cliente/verCliente/" + id;
     }
+
     @PostMapping("/verAgricultor/{id}")
     public String actualizarAgricultor(@PathVariable Integer id, @ModelAttribute("agricultorDto") CrearAgricultorDto dto, Model model) {
         agricultorService.actualizarAgricultor(id, dto);
-        
-        return "redirect:/site/verAgricultor/" + id;
+
+        return "redirect:/site/agricultor/verAgricultor/" + id;
     }
+
     @GetMapping("/cambiarClave")
     public String mostrarFormCambioClave(Model model, Authentication authentication) {
         CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
         Usuario usuario = userDetails.getUsuario();
         //Integer idUser = usuario.getId();
-        
-        model.addAttribute("usuario", usuario); 
-        return "cambiarClave"; 
+
+        model.addAttribute("usuario", usuario);
+        return "cambiarClave";
     }
+
     @PostMapping("/cambiarClave")
     public String cambiarClave(@RequestParam("claveActual") String claveActual, @RequestParam("nuevaClave") String nuevaClave, Authentication authentication, Model model) {
 
-	    CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
-	    Usuario usuario = userDetails.getUsuario();
-	
-	    if (!passwordEncoder.matches(claveActual, usuario.getClave())) {
-	        model.addAttribute("error", "La clave actual es incorrecta");
-	        model.addAttribute("usuario", usuario);
-	        return "cambiarClave";
-	    }
-	    usuario.setClave(nuevaClave);
-	    usuarioService.actualizarClave(usuario.getId(), usuario);
-	
-	    model.addAttribute("mensaje", "Clave actualizada exitosamente");
-	    	
-    	return "redirect:/site/login";
+        CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
+        Usuario usuario = userDetails.getUsuario();
+
+        if (!passwordEncoder.matches(claveActual, usuario.getClave())) {
+            model.addAttribute("error", "La clave actual es incorrecta");
+            model.addAttribute("usuario", usuario);
+            return "cambiarClave";
+        }
+        usuario.setClave(nuevaClave);
+        usuarioService.actualizarClave(usuario.getId(), usuario);
+
+        model.addAttribute("mensaje", "Clave actualizada exitosamente");
+
+        return "redirect:/site/login";
     }
 
 
-    
-	
 }

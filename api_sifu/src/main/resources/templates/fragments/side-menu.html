@@ -15,7 +15,7 @@
 				<!-- ---------------------------------- -->
 				<li class="sidebar-item" >
 					<a class="sidebar-link justify-content-between has-arrow"
-					   href="javascript:void(0)" aria-expanded="true">
+					   href="javascript:void(0)" aria-expanded="false">
 						<div class="d-flex align-items-center gap-3">
 							<span class="d-flex"> <i class="ti ti-building-store fs-8"></i>
 							</span> <span class="hide-menu">Tienda</span>
@@ -47,9 +47,9 @@
 				<!------------------------------------- -->
 				<!-- Menu Administración -->
 				<!-- ---------------------------------- -->
-				<li class="sidebar-item" sec:authorize="isAuthenticated()">
+				<li class="sidebar-item" sec:authorize="hasAuthority('ADMIN')">
 					<a class="sidebar-link justify-content-between has-arrow"
-					   href="javascript:void(0)" aria-expanded="true">
+					   href="javascript:void(0)" aria-expanded="false">
 						<div class="d-flex align-items-center gap-3">
 							<span class="d-flex"> <i class="ti ti-user"></i>
 							</span> <span class="hide-menu">Reportes</span>
@@ -78,176 +78,52 @@
 						</li>
 					</ul>
 				</li>
-				
 
-				<!--//GESTION DE PRODUCTOS -->
-				<li class="sidebar-item"><a
-					class="sidebar-link justify-content-between has-arrow"
-					href="javascript:void(0)" aria-expanded="false">
+
+				<li class="sidebar-item" sec:authorize="isAuthenticated()">
+					<a class="sidebar-link justify-content-between has-arrow"
+					   href="javascript:void(0)" aria-expanded="false">
 						<div class="d-flex align-items-center gap-3">
-							<span class="d-flex"> <i class="ti ti-package"></i>
-							</span> <span class="hide-menu">Productos</span>
+							<span class="d-flex"> <i class="ti ti-user"></i>
+							</span> <span class="hide-menu">Administración</span>
 						</div>
-
-				</a>
+					</a>
 					<ul aria-expanded="false" class="collapse first-level">
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
+						<li class="sidebar-item" >
+							<a class="sidebar-link justify-content-between" th:href="@{/site/perfil}">
 								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
+									<div class="round-16 d-flex align-items-center justify-content-center">
+										<i class="ti ti-user-circle fs-4"></i>
 									</div>
-									<span class="hide-menu">Home Productos</span>
+									<span class="hide-menu">Perfil</span>
 								</div>
-
-						</a></li>
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
+							</a>
+						</li>
+						<li class="sidebar-item" sec:authorize="hasAuthority('AGRICULTOR')" >
+							<a class="sidebar-link justify-content-between" th:href="@{/agricultor/agregar-productos}">
 								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
+									<div class="round-16 d-flex align-items-center justify-content-center">
+										<i class="ti ti-circle-plus fs-4"></i>
 									</div>
-									<span class="hide-menu">Nuevo Producto</span>
+									<span class="hide-menu">Agregar Productos</span>
 								</div>
-
-						</a></li>
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
+							</a>
+						</li>
+						<li class="sidebar-item" sec:authorize="hasAuthority('AGRICULTOR')">
+							<a class="sidebar-link justify-content-between" th:href="@{/agricultor/ver-productos}">
 								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
+									<div class="round-16 d-flex align-items-center justify-content-center">
+										<i class="ti ti-package fs-4"></i>
 									</div>
-									<span class="hide-menu">Listar Producto</span>
+									<span class="hide-menu">Mis productos</span>
 								</div>
-
-						</a></li>
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
-								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
-									</div>
-									<span class="hide-menu">Stock Productos</span>
-								</div>
-
-						</a></li>
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
-								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
-									</div>
-									<span class="hide-menu">Productos en Donación</span>
-								</div>
-						</a></li>
-					</ul></li>
-
-				<!--//CARRITO DE COMPRAS -->
-				<li class="sidebar-item"><a
-					class="sidebar-link justify-content-between has-arrow"
-					href="javascript:void(0)" aria-expanded="false">
-						<div class="d-flex align-items-center gap-3">
-							<span class="d-flex"> <i class="ti ti-shopping-cart"></i>
-							</span> <span class="hide-menu">Carrito</span>
-						</div>
-
-				</a>
-					<ul aria-expanded="false" class="collapse first-level">
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
-								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
-									</div>
-									<span class="hide-menu">Home Carrito</span>
-								</div>
-
-						</a></li>
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
-								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
-									</div>
-									<span class="hide-menu">Productos Seleccionados</span>
-								</div>
-
-						</a></li>
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
-								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
-									</div>
-									<span class="hide-menu">Detalle de Compras</span>
-								</div>
-
-						</a></li>
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
-								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
-									</div>
-									<span class="hide-menu">Estado de pedido</span>
-								</div>
-						</a></li>
-					</ul></li>
-
-				<!--//PAGOS -->
-				<li class="sidebar-item"><a
-					class="sidebar-link justify-content-between has-arrow"
-					href="javascript:void(0)" aria-expanded="false">
-						<div class="d-flex align-items-center gap-3">
-							<span class="d-flex"> <i class="ti ti-wallet"></i>
-							</span> <span class="hide-menu">Pagos</span>
-						</div>
-
-				</a>
-					<ul aria-expanded="false" class="collapse first-level">
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
-								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
-									</div>
-									<span class="hide-menu">Home Pagos</span>
-								</div>
-
-						</a></li>
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
-								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
-									</div>
-									<span class="hide-menu">Listar Pagos</span>
-								</div>
-
-						</a></li>
-						<li class="sidebar-item"><a
-							class="sidebar-link justify-content-between" href="#">
-								<div class="d-flex align-items-center gap-3">
-									<div
-										class="round-16 d-flex align-items-center justify-content-center">
-										<i class="ti ti-circle"></i>
-									</div>
-									<span class="hide-menu">Realizar Pagos</span>
-								</div>
-						</a></li>
+							</a>
+						</li>
 					</ul>
 				</li>
+				
+
+
 			</ul>
 		</nav>
 	</div>

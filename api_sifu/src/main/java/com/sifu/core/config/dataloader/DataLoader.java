@@ -1,11 +1,7 @@
 package com.sifu.core.config.dataloader;
 
-import com.sifu.core.repo.PersonaRepository;
-import com.sifu.core.repo.RolRepository;
-import com.sifu.core.repo.UsuarioRepository;
-import com.sifu.core.utils.entity.Persona;
-import com.sifu.core.utils.entity.Rol;
-import com.sifu.core.utils.entity.Usuario;
+import com.sifu.core.repo.*;
+import com.sifu.core.utils.entity.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +22,10 @@ public class DataLoader implements CommandLineRunner {
     private RolRepository rolRepo;
     @Autowired
     private PasswordEncoder encoder;
+    @Autowired
+    private ClienteRepository clienteRepository;
+    @Autowired
+    private AgricultorRepository agricultorRepository;
 
     @Override
     @Transactional
@@ -71,6 +71,20 @@ public class DataLoader implements CommandLineRunner {
                 usuarioRepo.save(new Usuario(null, alias, encodedPassword, true, persona, rol));
             }
             log.info("Persona con alias " + alias + " registrado");
+
+            if (rol.getNombre().equals("CLIENTE") && clienteRepository.findByPersonaId(persona.getId()).isEmpty() ) {
+                Cliente cliente = new Cliente();
+                cliente.setPersona(persona);
+                cliente.setEntidadSFL(false);
+                clienteRepository.save(cliente);
+            }
+
+            if (rol.getNombre().equals("AGRICULTOR") && agricultorRepository.findByPersonaId(persona.getId()).isEmpty()) {
+                Agricultor agricultor = new Agricultor();
+                agricultor.setPersona(persona);
+                agricultorRepository.save(agricultor);
+            }
+
         } catch (Exception e) {
             log.error("Error insertando usuario:{}", e.getMessage());
         }

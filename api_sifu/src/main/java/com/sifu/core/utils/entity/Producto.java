@@ -18,8 +18,12 @@ public class Producto {
 	
 	private Double precio;
 	private String nombre;
-	
-	@ManyToOne
+
+    @Lob
+    @Column(columnDefinition = "LONGTEXT")
+    private String image;
+
+    @ManyToOne
     @JoinColumn(name = "categoria_id")
     private CategoriaProd categoriaProd;
 	

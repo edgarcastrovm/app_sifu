@@ -11,3 +11,7 @@
     transition: 0.2s ease-in;
     padding-top: 80px;
 }
+
+.modal-content{
+    border-radius: .2rem;
+}

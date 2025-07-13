@@ -1,6 +1,7 @@
 package com.sifu.core.utils.entity;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +25,10 @@ public class Cliente {
     private Persona persona;
 
 	@OneToMany(mappedBy = "cliente")
+    @JsonIgnore
     private List<Factura> factura;
 
     @OneToMany(mappedBy = "cliente")
+    @JsonIgnore
     private List<Carrito> carrito;
 }
