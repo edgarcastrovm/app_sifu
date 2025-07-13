@@ -31,7 +31,7 @@ public class AgriProd {
 
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    private String iamge;
+    private String image;
 
     @OneToMany(mappedBy = "producto")
     private List<DetalleFact> detalleFact;
