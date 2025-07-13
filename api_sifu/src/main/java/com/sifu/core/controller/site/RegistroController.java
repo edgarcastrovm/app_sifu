@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.sifu.core.repo.AgricultorRepository;
 import com.sifu.core.service.AgricultorService;
 import com.sifu.core.service.ClienteService;
 import com.sifu.core.service.PersonaService;
@@ -25,7 +24,6 @@ import com.sifu.core.utils.dto.dominio.CrearClienteDto;
 import com.sifu.core.utils.entity.Agricultor;
 import com.sifu.core.utils.entity.Cliente;
 import com.sifu.core.utils.entity.Persona;
-import com.sifu.core.utils.entity.Rol;
 import com.sifu.core.utils.entity.Usuario;
 
 import org.springframework.security.core.Authentication;

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Anuncios</title>
+    <link rel="shortcut icon" type="image/png" th:href="@{/assets/images/logos/planta.png}" />
+    <link rel="stylesheet" th:href="@{/assets/css/styles.min.css}" />
+</head>
+<body>
+<div class="page-wrapper" id="main-wrapper">
+
+    <div class="position-relative overflow-hidden text-bg-light min-vh-100 d-flex align-items-center justify-content-center">
+        <div class="d-flex align-items-center justify-content-center w-100">
+            <div class="row justify-content-center w-100">
+                <div class="col-md-8 col-lg-6 col-xxl-4">
+                    <div class="card mb-0">
+                        <div class="card-body">
+                            <div class="contenedor1 text-center">
+                                <img th:src="@{/assets/images/logos/planta.png}" alt="Logo" class="planta" style="width: 80px;" />
+                            </div>
+                            <form th:action="${modoEdicion} ? @{/site/editarAnuncio/{id}(id=${anuncio.id})} 
+                                 : @{/site/crearAnuncio/{id}(id=${agricultor.id})}"  th:object="${anuncio}" method="post">
+                            	<div class="mb-3">
+                                    <label>Estado</label>
+                                    <select class="form-select" th:field="*{estado}" required>
+                                        <option value="" disabled selected>Selecciona una opción</option>
+                                        <option value="Disponible">Disponible</option>
+                                        <option value="Caducado">Caducado</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label>Descripción</label>
+                                    <textarea class="form-control" th:field="*{descripcion}" required></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-success">Publicar</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <br>
+                    <h4>Anuncios Publicados</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Accion</th>
+                            </tr>
+                        </thead>
+                        <tbody >
+                            <tr th:each="anuncio : ${anunciosGuardados}">
+                                <td th:text="${anuncio.descripcion}"></td>
+                                <td th:text="${anuncio.estado}"></td>
+                                <td th:text="${#temporals.format(anuncio.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></td>
+                                <td>
+                                	 <a th:href="@{/site/editarAnuncio/{id}(id=${anuncio.id})}"  class="btn btn-warning btn-sm">Editar</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <a th:href="@{/sifu/agricultores/anuncios/nuevo}">Crear Nuevo Anuncio</a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
