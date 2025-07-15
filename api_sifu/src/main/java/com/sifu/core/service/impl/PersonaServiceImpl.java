@@ -10,42 +10,40 @@ import com.sifu.core.service.PersonaService;
 import com.sifu.core.utils.entity.Persona;
 
 @Service
-public class PersonaServiceImpl implements PersonaService{
+public class PersonaServiceImpl implements PersonaService {
 
-	private static final Logger log = LogManager.getLogger(AgricultorServiceImpl.class);
+	private static final Logger log = LogManager.getLogger(PersonaServiceImpl.class);
 	@Autowired
 	private PersonaRepository personaRepository;
 
 	@Override
 	public Persona crearPersona(Persona persona) {
+		log.info("crearPersona() called");
 		// TODO Auto-generated method stub
 		return personaRepository.save(persona);
 	}
 
 	@Override
 	public Persona obtenerPorId(Integer id) {
+		log.info("obtenerPorId() called");
 		// TODO Auto-generated method stub
 		return personaRepository.findById(id).orElse(null);
 	}
 
 	@Override
 	public Persona actualizarPersona(Integer id, Persona persona) {
-		// TODO Auto-generated method stub
-		 
-		
+		log.info("actualizarPersona() called");
 		Persona personaExistente = personaRepository.findById(id)
-		        .orElseThrow(() -> new RuntimeException("Persona no encontrado con ID: " + id));
+				.orElseThrow(() -> new RuntimeException("Persona no encontrado con ID: " + id));
 
 		log.info("Actualizando Persona ID {}: {} {}", id, persona.getNombre(), persona.getApellido());
-		    
+
 		personaExistente.setNombre(persona.getNombre());
-		personaExistente.setApellido(persona.getApellido()); 
-		personaExistente.setCedula(persona.getCedula()); 
-		personaExistente.setCelular(persona.getCelular()); 
-		personaExistente.setCorreo(persona.getCorreo()); 
-	    return personaRepository.save(personaExistente);
+		personaExistente.setApellido(persona.getApellido());
+		personaExistente.setCedula(persona.getCedula());
+		personaExistente.setCelular(persona.getCelular());
+		personaExistente.setCorreo(persona.getCorreo());
+		return personaRepository.save(personaExistente);
 	}
-	
-	
-	
+
 }

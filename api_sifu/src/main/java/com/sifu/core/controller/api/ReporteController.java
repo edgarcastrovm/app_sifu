@@ -23,6 +23,7 @@ public class ReporteController {
 
     @GetMapping
     public ResponseEntity<?> ventas(){
+    	log.info("ventas() called");
         ApiResponse response = reporteService.ventas();
         return ResponseEntity.ok(response);
     }

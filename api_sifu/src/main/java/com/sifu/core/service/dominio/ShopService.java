@@ -40,6 +40,7 @@ public class ShopService implements IShopService {
     }
 
     public ApiResponse<List<CategoriaProdDto>> listarCategorias() {
+    	log.info("listarCategorias() called");
         List<CategoriaProd> itemsBase = categoriaProdRepository.findAll();
         List<CategoriaProdDto> items;
         if (!itemsBase.isEmpty()) {
@@ -54,6 +55,7 @@ public class ShopService implements IShopService {
     }
 
     public ApiResponse<List<ProductoDto>> listarProductos() {
+    	log.info("listarProductos() called");
         List<Producto> itemsBase = productoRepository.findAll();
         List<ProductoDto> items;
         if (!itemsBase.isEmpty()) {
@@ -69,6 +71,7 @@ public class ShopService implements IShopService {
 
 
     public ApiResponse<List<AgriProdDto>> listarProductosAgricultor(Integer id) {
+    	log.info("listarProductosAgricultor() called");
         List<AgriProd> itemsBase = agriProdRepository.findByAgricultor_Id(id);
         List<AgriProdDto> items;
         if (!itemsBase.isEmpty()) {
@@ -83,6 +86,7 @@ public class ShopService implements IShopService {
     }
 
     public ApiResponse<List<AgriProdDto>> listarProductosAgricultorByUser(Usuario usuario) {
+    	log.info("listarProductosAgricultorByUser() called");
         Integer id = usuario.getPersona().getAgricultor().getId();
         log.info(String.format("Agricultor id: %d", id));
 
@@ -100,6 +104,7 @@ public class ShopService implements IShopService {
     }
 
     public ApiResponse<List<AgriProdDto>> agregarProductoAlCarrito(Usuario usuario, ProductoDto item) {
+    	log.info("agregarProductoAlCarrito() called");
         Integer id = usuario.getPersona().getCliente().getId();
         log.info(String.format("Cliente id: %d", id));
         //validamos cliente
@@ -138,6 +143,7 @@ public class ShopService implements IShopService {
     }
 
     public ApiResponse<List<DetalleCarritoDto>> verCarrito(Usuario usuario) {
+    	log.info("verCarrito() called");
         Integer id = usuario.getPersona().getCliente().getId();
         log.info(String.format("Cliente id: %d", id));
         //validamos cliente
@@ -170,7 +176,8 @@ public class ShopService implements IShopService {
     }
 
     public ApiResponse<List<AgricultorDto>> listarAgricultores() {
-        List<Agricultor> itemsBase = agricultorRepository.findAll();
+    	log.info("listarAgricultores() called");
+    	List<Agricultor> itemsBase = agricultorRepository.findAll();
         List<AgricultorDto> items;
         if (!itemsBase.isEmpty()) {
             items = itemsBase.stream().map(AgricultorDto::new).collect(Collectors.toList());
