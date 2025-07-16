@@ -4,6 +4,7 @@ import com.sifu.core.config.http.ApiResponse;
 import com.sifu.core.config.http.RC;
 import com.sifu.core.repo.*;
 import com.sifu.core.utils.dto.*;
+import com.sifu.core.utils.dto.dominio.AgricultorByProductoDto;
 import com.sifu.core.utils.entity.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -90,6 +91,20 @@ public class ShopService implements IShopService {
         List<AgriProdDto> items;
         if (!itemsBase.isEmpty()) {
             items = itemsBase.stream().map(AgriProdDto::new).collect(Collectors.toList());
+            log.info("Productos encontrados: {}", items.size());
+            return ApiResponse.success(items);
+        } else {
+            log.error("No se encontraron productos");
+            items = new ArrayList<>();
+            return ApiResponse.error(RC.NOT_FOUND,items);
+        }
+    }
+    public ApiResponse<List<AgricultorByProductoDto>> listarAgricultorByProductoId(Integer id) {
+
+        List<AgriProd> itemsBase = agriProdRepository.findByProducto_Id(id);
+        List<AgricultorByProductoDto> items;
+        if (!itemsBase.isEmpty()) {
+            items = itemsBase.stream().map(AgricultorByProductoDto::new).collect(Collectors.toList());
             log.info("Productos encontrados: {}", items.size());
             return ApiResponse.success(items);
         } else {

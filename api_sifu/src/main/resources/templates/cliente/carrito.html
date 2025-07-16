@@ -7,7 +7,18 @@
 </head>
 <body>
 <div class="row" layout:fragment="content">
-
+<style>
+    .txt-stock{
+        max-width: 60px;
+        padding: 0 0 0 4px;
+        border-radius: .2rem;
+    }
+    .item-detalle{
+        margin: 0;
+        border-bottom: solid 1px #ccc;
+        border-bottom-style: dashed;
+    }
+</style>
     <div class="container mt-4">
         <h2>Carrito de Compras</h2>
         <div id="alerta" class="alert d-none" role="alert"></div>
@@ -18,49 +29,156 @@
             <strong>Total seleccionado: <span id="total-general">$0.00</span></strong>
             <button class="btn btn-primary" onclick="facturarSeleccionados()">Facturar Seleccionados</button>
         </div>
-    </div>
-    <script>
+        <script>
+            let carritoItems = [];
 
-        let carritoItems = [];
+            function crearListaAgricultor(idItem,idProducto) {
 
-        async function listarItems() {
-            try {
-                const res = await fetch(`${URL_BASE}/api/shop/cliente/my-cart`);
-                const json = await res.json();
+                const container = document.getElementById(`${idItem}-accordionAgricultores`);
+                container.innerHTML = '';
+                fetch(`${URL_BASE}/api/shop/agricultores/productos/${idProducto}`)
+                    .then(res => res.json())
+                    .then(json => {
+                        if (!json.data || json.data.length === 0) {
+                            document.getElementById('accordionAgricultores').innerHTML = '<p>No hay productores disponibles.</p>';
+                            return;
+                        }
 
-                if (!res.ok) {
-                    mostrarAlerta('danger', json.msg || 'Error al obtener el carrito');
-                    throw new Error(json.msg);
-                }
+                        renderizarAccordion(json.data,idItem);
+                        llenarCombo(json.data,idItem);
+                    })
+                    .catch(err => console.error('Error al cargar productores:', err));
 
-                carritoItems = json.data;
-                renderizarCarrito();
-
-            } catch (err) {
-                console.error("Error:", err);
             }
-        }
 
-        function renderizarCarrito() {
-            const lista = document.getElementById("lista-carrito");
-            const totalGeneral = document.getElementById("total-general");
-            lista.innerHTML = "";
+            function renderizarAccordion(data,idItem) {
+                const container = document.getElementById(`${idItem}-accordionAgricultores`);
+                container.innerHTML = '';
+                let itemsDisponibles='';
+                data.forEach((item, index) => {
+                    const stockDisponible = item.stock > 0;
+                    itemsDisponibles += `<tr>
+                        <td>
+                            <p class="item-detalle">${item.nombreAgricultor}</p>
+                            <p class="item-detalle">${item.correoAgricultor}</p>
+                            <p class="item-detalle">${item.telefonoAgricultor}</p>
+                        </td>
+                        <td>${item.stock}</td>
+                        <td>
+                            ${stockDisponible ? `
+                            <button class="btn btn-primary btn-sm"
+                                onclick="seleccionarAgricultor(${idItem},${item.idAgricultor}, '${item.nombreAgricultor}')">
+                                Seleccionar
+                            </button>` :
+                            '<span class="text-danger">Sin stock</span>'}
+                        </td>
+                    </tr>`
 
-            let totalSeleccionado = 0;
+                });
 
-            carritoItems.forEach(item => {
-                const cantidad = item.cantidad ?? 1;
-                const precio = item.producto.precio;
-                const subtotal = cantidad * precio;
 
-                const li = document.createElement("li");
-                li.className = "list-group-item d-flex justify-content-between align-items-start";
+                const card = document.createElement('div');
+                card.innerHTML = `
+                <div  class="card p-2" >
+                    <div class="card-body">
+                        <table class="table table-sm">
+                            <thead>
+                                <th>Agricultor</th><th>Stock</th><th>Acción</th>
+                            </thead>
+                            <tbody>${itemsDisponibles}</tbody>
+                        </table>
+                    </div>
+                </div>
+                `
+                container.append(card);
+            }
 
-                li.innerHTML = `
+            function llenarCombo(data,idItem) {
+                const combo = document.getElementById(`${idItem}-comboAgricultor`);
+                combo.innerHTML = `<option value="">-- Seleccione un agricultor --</option>`;
+
+                const unicos = data.filter(d => d.stock > 0);
+                unicos.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.idAgricultor;
+                    opt.textContent = d.nombreAgricultor;
+                    combo.appendChild(opt);
+                });
+            }
+
+            function seleccionarAgricultor(idItem,id, nombre) {
+                const combo = document.getElementById(`${idItem}-comboAgricultor`);
+                combo.value = id;
+                alert(`Agricultor ${nombre} seleccionado.`);
+            }
+
+            async function listarItems() {
+                try {
+                    const res = await fetch(`${URL_BASE}/api/shop/cliente/my-cart`);
+                    const json = await res.json();
+                    if (!res.ok) {
+                        mostrarAlerta('danger', json.msg || 'Error al obtener el carrito');
+                        throw new Error(json.msg);
+                    }
+
+                    carritoItems = json.data;
+                    renderizarCarrito();
+
+                } catch (err) {
+                    console.error("Error:", err);
+                }
+            }
+
+            function renderizarCarrito() {
+                const lista = document.getElementById("lista-carrito");
+                const totalGeneral = document.getElementById("total-general");
+                lista.innerHTML = "";
+
+                let totalSeleccionado = 0;
+
+                carritoItems.forEach(item => {
+                    const cantidad = item.cantidad ?? 1;
+                    const precio = item.producto.precio;
+                    const subtotal = cantidad * precio;
+
+                    const li = document.createElement("li");
+                    li.id=`${item.id}-producto`
+                    li.className = "list-group-item d-flex flex-row justify-content-between align-items-start";
+                    li.innerHTML = `
+
                 <div class="form-check me-3">
                     <input class="form-check-input check-item" type="checkbox" value="${item.id}" onchange="actualizarTotalSeleccionado()">
                 </div>
-                <div class="ms-2 me-auto w-100">
+                <div class="accordion w-75" >
+                    <div class="mb-1">
+                        <button class="btn-search btn btn-sm btn-primary"
+                           onclick="crearListaAgricultor(${item.id},${item.producto.id})"
+                           title="Buscar agricultores con este producto">
+                                <i class="ti ti-search"></i>
+                       </button>
+                        <label for="comboAgricultor" class="form-label">
+                        Agricultor Seleccionado</label>
+                        <select id="${item.id}-comboAgricultor" class="form-select">
+                            <option value="">-- Seleccione un agricultor --</option>
+                        </select>
+                    </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header bg-info">
+                          <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#${item.id}-accordionAgricultores-content" aria-expanded="true"
+                            aria-controls="${item.id}-accordionAgricultores-content">
+                            Agricultores disponibles
+                          </button>
+                        </h2>
+                        <div id="${item.id}-accordionAgricultores-content" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+
+                          <div id="${item.id}-accordionAgricultores" class="accordion-body" >
+                            <label>Da click en el boton buscar para poder visualizar los agricultores con este producto <i class="ti ti-search"></i></label>
+                          </div>
+                        </div>
+                      </div>
+                </div>
+                <div class="ms-2 me-auto auto">
                     <div class="fw-bold d-flex justify-content-between">
                         <span>${item.producto.nombre}</span>
                         <span>$${subtotal.toFixed(2)}</span>
@@ -68,90 +186,91 @@
                     <div class="text-muted">${item.producto.categoriaProd.nombre}</div>
                     <div class="mt-2 d-flex align-items-center gap-2">
                         <button class="btn btn-sm btn-secondary" onclick="modificarCantidad(${item.id}, -1)">−</button>
-                        <input type="number" name="" id="${item.id}-cantidad" value="${cantidad}"/>
+                        <input type="number" class="form-control txt-stock" min="1" max="999" id="${item.id}-cantidad" value="${cantidad}"/>
                         <button class="btn btn-sm btn-secondary" onclick="modificarCantidad(${item.id}, 1)">+</button>
                         <button class="btn btn-sm btn-outline-danger ms-auto" onclick="eliminarItem(${item.id})">🗑</button>
                     </div>
                 </div>
             `;
 
-                lista.appendChild(li);
-            });
+                    lista.appendChild(li);
+                });
 
-            actualizarTotalSeleccionado();
-        }
-
-        function modificarCantidad(id, delta) {
-            // fetch(`${URL_BASE}/api/shop/update-item-cart/${id}?delta=${delta}`, {
-            //     method: 'PUT'
-            // })
-            //     .then(res => res.json())
-            //     .then(json => {
-            //         mostrarAlerta('success', json.msg || 'Cantidad actualizada');
-            //         listarItems();
-            //     })
-            //     .catch(err => console.error("Error al actualizar cantidad:", err));
-            const input = document.getElementById(`${id}-cantidad`)
-            input.value = parseInt(input.value) + delta
-            console.log(input.value)
-            actualizarTotalSeleccionado()
-        }
-
-        function eliminarItem(id) {
-            if (!confirm("¿Eliminar este producto del carrito?")) return;
-
-            fetch(`${URL_BASE}/api/shop/delete-item-cart/${id}`, {
-                method: 'DELETE'
-            })
-                .then(res => res.json())
-                .then(json => {
-                    mostrarAlerta('info', json.msg || 'Producto eliminado');
-                    listarItems();
-                })
-                .catch(err => console.error("Error al eliminar:", err));
-        }
-
-        function actualizarTotalSeleccionado() {
-            const checkboxes = document.querySelectorAll('.check-item:checked');
-            let total = 0;
-
-            checkboxes.forEach(cb => {
-                const item = carritoItems.find(i => i.id === parseInt(cb.value));
-                const input = document.getElementById(`${item.id}-cantidad`)
-                //const cantidad = item.cantidad ?? 1;
-                const cantidad = parseInt(input.value) ?? 1;
-                const precio = item.producto.precio;
-                total += cantidad * precio;
-            });
-
-            document.getElementById('total-general').textContent = `$${total.toFixed(2)}`;
-        }
-
-        function facturarSeleccionados() {
-            const checkboxes = document.querySelectorAll('.check-item:checked');
-            const seleccionados = Array.from(checkboxes).map(cb => parseInt(cb.value));
-
-            if (seleccionados.length === 0) {
-                alert("Seleccione al menos un producto para facturar.");
-                return;
+                actualizarTotalSeleccionado();
             }
 
-            console.log("Facturando IDs:", seleccionados);
-            // Aquí puedes enviar los IDs seleccionados al backend:
-            // fetch(`${URL_BASE}/api/shop/facturar`, { method: 'POST', body: JSON.stringify(seleccionados) })
-            alert("Facturación simulada. Ver consola.");
-        }
+            function modificarCantidad(id, delta) {
+                // fetch(`${URL_BASE}/api/shop/update-item-cart/${id}?delta=${delta}`, {
+                //     method: 'PUT'
+                // })
+                //     .then(res => res.json())
+                //     .then(json => {
+                //         mostrarAlerta('success', json.msg || 'Cantidad actualizada');
+                //         listarItems();
+                //     })
+                //     .catch(err => console.error("Error al actualizar cantidad:", err));
+                const input = document.getElementById(`${id}-cantidad`)
+                input.value = parseInt(input.value) + delta
+                console.log(input.value)
+                actualizarTotalSeleccionado()
+            }
 
-        function mostrarAlerta(tipo, mensaje) {
-            const alerta = document.getElementById('alerta');
-            alerta.className = `alert alert-${tipo}`;
-            alerta.textContent = mensaje;
-            alerta.classList.remove('d-none');
-            setTimeout(() => alerta.classList.add('d-none'), 3000);
-        }
+            function eliminarItem(id) {
+                if (!confirm("¿Eliminar este producto del carrito?")) return;
 
-        document.addEventListener('DOMContentLoaded', listarItems);
-    </script>
+                fetch(`${URL_BASE}/api/shop/delete-item-cart/${id}`, {
+                    method: 'DELETE'
+                })
+                    .then(res => res.json())
+                    .then(json => {
+                        mostrarAlerta('info', json.msg || 'Producto eliminado');
+                        listarItems();
+                    })
+                    .catch(err => console.error("Error al eliminar:", err));
+            }
+
+            function actualizarTotalSeleccionado() {
+                const checkboxes = document.querySelectorAll('.check-item:checked');
+                let total = 0;
+
+                checkboxes.forEach(cb => {
+                    const item = carritoItems.find(i => i.id === parseInt(cb.value));
+                    const input = document.getElementById(`${item.id}-cantidad`)
+                    //const cantidad = item.cantidad ?? 1;
+                    const cantidad = parseInt(input.value) ?? 1;
+                    const precio = item.producto.precio;
+                    total += cantidad * precio;
+                });
+
+                document.getElementById('total-general').textContent = `$${total.toFixed(2)}`;
+            }
+
+            function facturarSeleccionados() {
+                const checkboxes = document.querySelectorAll('.check-item:checked');
+                const seleccionados = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+                if (seleccionados.length === 0) {
+                    alert("Seleccione al menos un producto para facturar.");
+                    return;
+                }
+
+                console.log("Facturando IDs:", seleccionados);
+                // Aquí puedes enviar los IDs seleccionados al backend:
+                // fetch(`${URL_BASE}/api/shop/facturar`, { method: 'POST', body: JSON.stringify(seleccionados) })
+                alert("Facturación simulada. Ver consola.");
+            }
+
+            function mostrarAlerta(tipo, mensaje) {
+                const alerta = document.getElementById('alerta');
+                alerta.className = `alert alert-${tipo}`;
+                alerta.textContent = mensaje;
+                alerta.classList.remove('d-none');
+                setTimeout(() => alerta.classList.add('d-none'), 3000);
+            }
+
+            document.addEventListener('DOMContentLoaded', listarItems);
+        </script>
+    </div>
 </div>
 </body>
 

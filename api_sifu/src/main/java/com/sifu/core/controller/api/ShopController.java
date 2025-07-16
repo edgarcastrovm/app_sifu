@@ -51,6 +51,12 @@ public class ShopController {
         return ResponseEntity.ok().body(shopService.listarProductosAgricultorByUser(usuario));
     }
 
+    @GetMapping("/agricultores/productos/{id}")
+    public ResponseEntity<?> listarAgricultorByProductoId(@PathVariable Integer id) {
+
+        return ResponseEntity.ok().body(shopService.listarAgricultorByProductoId(id));
+    }
+
     @PostMapping("/add-item-cart")
     public ResponseEntity<?> agregarItemCarrito(Authentication authentication, @RequestBody ProductoDto item) {
         if (authentication==null){
