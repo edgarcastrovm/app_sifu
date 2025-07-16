@@ -63,35 +63,41 @@ public class RegistroController {
 
     @GetMapping("/registrarAgricultor")
     public String mostrarFormulario(Model model) {
+    	log.info("mostrarFormulario() called");
         model.addAttribute("registro", new CrearAgricultorDto());
         return "login/registrar-agricultor";
     }
 
     @GetMapping("/registroExitoso")
     public String mostrarRegistroExitoso() {
+    	log.info("mostrarRegistroExitoso() called");
         return "exito";
     }
 
     @GetMapping("/registrarCliente")
     public String mostrarFormularioCliente(Model model) {
+    	log.info("mostrarFormularioCliente() called");
         model.addAttribute("registroC", new CrearClienteDto());
         return "login/registrar-cliente";
     }
 
     @PostMapping("/registrarAgricultor")
     public String registrarAgricultor(CrearAgricultorDto registro, Model model) {
+    	log.info("registrarAgricultor() called");
         agricultorService.crearAgricultor(registro);
         return "redirect:/site/registroExitoso";
     }
 
     @PostMapping("/registrarCliente")
     public String registrarCliente(CrearClienteDto registroC, Model model) {
+    	log.info("registrarCliente() called");
         clienteService.crearCliente(registroC);
         return "redirect:/site/registroExitoso";
     }
 
     @GetMapping("/verCliente/{id}")
     public String verCliente(@PathVariable Integer id, Model model) {
+    	log.info("verCliente() called");
         Cliente cliente = clienteService.obtenerPorId(id);
         if (cliente == null) {
             return "redirect:/sifu/site";
@@ -117,7 +123,7 @@ public class RegistroController {
 
     @GetMapping("/verAgricultor/{id}")
     public String verAgricultor(@PathVariable Integer id, Model model) {
-
+    	log.info("verAgriculator() called");
         Agricultor agricultor = agricultorService.obtenerPorId(id);
         if (agricultor == null) {
             return "redirect:/sifu/site";
@@ -140,7 +146,7 @@ public class RegistroController {
 
     @GetMapping("/perfil")
     public String redirigirSegunRol(Authentication authentication) throws JsonProcessingException {
-
+    	log.info("redirigirSegunRol() called");
         CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
         Usuario usuario = userDetails.getUsuario();
         String rol = usuario.getRol().getNombre();
@@ -168,6 +174,7 @@ public class RegistroController {
 
     @PostMapping("/verCliente/{id}")
     public String actualizarCliente(@PathVariable Integer id, @ModelAttribute("clienteDto") ActualizarClienteDto dto, Model model) {
+    	log.info("actualizarCliente() called");
         clienteService.actualizarCliente(id, dto);
 
         return "redirect:/site/cliente/verCliente/" + id;
@@ -175,6 +182,7 @@ public class RegistroController {
 
     @PostMapping("/verAgricultor/{id}")
     public String actualizarAgricultor(@PathVariable Integer id, @ModelAttribute("agricultorDto") CrearAgricultorDto dto, Model model) {
+    	log.info("actualizarAgricultor() called");
         agricultorService.actualizarAgricultor(id, dto);
 
         return "redirect:/site/agricultor/verAgricultor/" + id;
@@ -182,6 +190,7 @@ public class RegistroController {
 
     @GetMapping("/cambiarClave")
     public String mostrarFormCambioClave(Model model, Authentication authentication) {
+    	log.info("mostrarFormCambiarClave() called");
         CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
         Usuario usuario = userDetails.getUsuario();
         //Integer idUser = usuario.getId();
@@ -192,7 +201,7 @@ public class RegistroController {
 
     @PostMapping("/cambiarClave")
     public String cambiarClave(@RequestParam("claveActual") String claveActual, @RequestParam("nuevaClave") String nuevaClave, Authentication authentication, Model model) {
-
+    	log.info("cambiarClave() called");
         CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
         Usuario usuario = userDetails.getUsuario();
 

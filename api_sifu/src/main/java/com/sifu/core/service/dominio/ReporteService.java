@@ -17,12 +17,13 @@ public class ReporteService implements IReporteService {
     private final ReporteRepository facturaRepository;
 
     public ReporteService(ReporteRepository facturaRepository) {
-        this.facturaRepository = facturaRepository;
+        	this.facturaRepository = facturaRepository;
     }
 
     @Override
     public ApiResponse<?> ventas(){
-        List<ReporteFacturaDTO> items = facturaRepository.obtenerReporteVentas();
+    	log.info("ventas() called"); 
+    	List<ReporteFacturaDTO> items = facturaRepository.obtenerReporteVentas();
         if (items != null && items.size() > 0) {
             return ApiResponse.success(items);
         }else {

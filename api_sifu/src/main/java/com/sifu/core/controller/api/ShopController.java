@@ -31,21 +31,25 @@ public class ShopController {
 
     @GetMapping("/productos")
     public ResponseEntity<?> listarProductos() {
+    	log.info("listarProductos() called");
         return ResponseEntity.ok().body(shopService.listarProductos());
     }
 
     @GetMapping("/productos/agricultor/{id}")
     public ResponseEntity<?> listarProductosAgricultor(@PathVariable Integer id) {
+    	log.info("listarProductosAgricultor() called");
         return ResponseEntity.ok().body(shopService.listarProductosAgricultor(id));
     }
 
     @GetMapping("/agricultores")
     public ResponseEntity<?> listarAgricultores() {
+    	log.info("listarAgricultores() called");
         return ResponseEntity.ok().body(shopService.listarAgricultores());
     }
 
     @GetMapping("/agricultores/productos")
     public ResponseEntity<?> listarProductosAgricultor(Authentication authentication) {
+    	log.info("listarProductosAgricultor() called");
         CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
         Usuario usuario = userDetails.getUsuario();
         return ResponseEntity.ok().body(shopService.listarProductosAgricultorByUser(usuario));
@@ -59,6 +63,7 @@ public class ShopController {
 
     @PostMapping("/add-item-cart")
     public ResponseEntity<?> agregarItemCarrito(Authentication authentication, @RequestBody ProductoDto item) {
+    	log.info("agreagrItemCarrito() called");
         if (authentication==null){
             log.error("No se puede agregar el carrito de producto necesita loguearse al sistema");
             return ResponseEntity.badRequest().body(ApiResponse.error(RC.FORBIDDEN,"Necesita estar logueado como cliente"));
