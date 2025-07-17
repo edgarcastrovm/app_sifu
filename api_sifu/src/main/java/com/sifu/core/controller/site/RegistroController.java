@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import com.sifu.core.service.ClienteService;
 import com.sifu.core.service.PersonaService;
 import com.sifu.core.service.UsuarioService;
 import com.sifu.core.service.security.CustomIUserDetails;
+import com.sifu.core.utils.Utils;
 import com.sifu.core.utils.dto.dominio.ActualizarClienteDto;
 import com.sifu.core.utils.dto.dominio.CrearAgricultorDto;
 import com.sifu.core.utils.dto.dominio.CrearClienteDto;
@@ -25,6 +27,9 @@ import com.sifu.core.utils.entity.Agricultor;
 import com.sifu.core.utils.entity.Cliente;
 import com.sifu.core.utils.entity.Persona;
 import com.sifu.core.utils.entity.Usuario;
+
+import jakarta.validation.Valid;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +69,9 @@ public class RegistroController {
     @GetMapping("/registrarAgricultor")
     public String mostrarFormulario(Model model) {
         model.addAttribute("registro", new CrearAgricultorDto());
+        
+        model.addAttribute("provincias", Utils.obtenerProvincias());
+        model.addAttribute("cantonesPorProvincia", Utils.cantonPorProvincia());
         return "login/registrar-agricultor";
     }
 
@@ -75,19 +83,57 @@ public class RegistroController {
     @GetMapping("/registrarCliente")
     public String mostrarFormularioCliente(Model model) {
         model.addAttribute("registroC", new CrearClienteDto());
+        
+        model.addAttribute("provincias", Utils.obtenerProvincias());
+        model.addAttribute("cantonesPorProvincia", Utils.cantonPorProvincia());
         return "login/registrar-cliente";
     }
 
     @PostMapping("/registrarAgricultor")
-    public String registrarAgricultor(CrearAgricultorDto registro, Model model) {
-        agricultorService.crearAgricultor(registro);
-        return "redirect:/site/registroExitoso";
+    public String registrarAgricultor(@Valid @ModelAttribute("registro") CrearAgricultorDto registro, Model model, BindingResult result) {
+        //agricultorService.crearAgricultor(registro);
+        //return "redirect:/site/registroExitoso";
+    	if (result.hasErrors()) {
+            model.addAttribute("provincias", Utils.obtenerProvincias());
+            model.addAttribute("cantonesPorProvincia", Utils.cantonPorProvincia());
+            return "login/registrar-agricultor";
+        }
+    	 try {
+    	        agricultorService.crearAgricultor(registro);
+    	        return "redirect:/site/registroExitoso";
+    	    } catch (IllegalArgumentException e) {
+    	        // Mensaje general
+    	        model.addAttribute("error", e.getMessage());
+    	        // Mantener provincias y cantones para que no se pierda al recargar la vista
+    	        model.addAttribute("provincias", Utils.obtenerProvincias());
+    	        model.addAttribute("cantonesPorProvincia", Utils.cantonPorProvincia());
+    	        return "login/registrar-agricultor";
+    	    }
     }
 
     @PostMapping("/registrarCliente")
-    public String registrarCliente(CrearClienteDto registroC, Model model) {
-        clienteService.crearCliente(registroC);
-        return "redirect:/site/registroExitoso";
+    public String registrarCliente(@Valid @ModelAttribute("registroC") CrearClienteDto registroC,
+            BindingResult result, Model model) {
+        //clienteService.crearCliente(registroC);
+    	//return "redirect:/site/registroExitoso";
+    	if (result.hasErrors()) {
+            model.addAttribute("provincias", Utils.obtenerProvincias());
+            model.addAttribute("cantonesPorProvincia", Utils.cantonPorProvincia());
+            return "login/registrar-cliente";
+        }
+    	 try {
+    	        clienteService.crearCliente(registroC);
+    	        return "redirect:/site/registroExitoso";
+    	    } catch (IllegalArgumentException e) {
+    	        // Mensaje general
+    	        model.addAttribute("error", e.getMessage());
+    	        // Mantener provincias y cantones para que no se pierda al recargar la vista
+    	        model.addAttribute("provincias", Utils.obtenerProvincias());
+    	        model.addAttribute("cantonesPorProvincia", Utils.cantonPorProvincia());
+    	        return "login/registrar-cliente";
+    	    }
+        
+        
     }
 
     @GetMapping("/verCliente/{id}")
@@ -105,12 +151,14 @@ public class RegistroController {
         dto.setCedula(persona.getCedula());
         dto.setCorreo(persona.getCorreo());
         dto.setCelular(persona.getCelular());
+        dto.setProvincia(persona.getProvincia());
+        dto.setCanton(persona.getCanton());
         dto.setEntidadSFL(cliente.getEntidadSFL());
-
         dto.setId(cliente.getId());
         // model.addAttribute("cliente", cliente.getId());
         model.addAttribute("clienteDto", dto);
-
+        model.addAttribute("provincias", Utils.obtenerProvincias());
+        model.addAttribute("cantonesPorProvincia", Utils.cantonPorProvincia());
 
         return "/cliente/VisualizarCliente";
     }
@@ -131,9 +179,12 @@ public class RegistroController {
         dto.setCedula(persona.getCedula());
         dto.setCorreo(persona.getCorreo());
         dto.setCelular(persona.getCelular());
-
+        dto.setProvincia(persona.getProvincia());
+        dto.setCanton(persona.getCanton());
         dto.setId(agricultor.getId());
         model.addAttribute("agricultorDto", dto);
+        model.addAttribute("provincias", Utils.obtenerProvincias());
+        model.addAttribute("cantonesPorProvincia", Utils.cantonPorProvincia());
 
         return "/agricultor/VisualizarAgricultor";
     }
@@ -170,14 +221,15 @@ public class RegistroController {
     public String actualizarCliente(@PathVariable Integer id, @ModelAttribute("clienteDto") ActualizarClienteDto dto, Model model) {
         clienteService.actualizarCliente(id, dto);
 
-        return "redirect:/site/cliente/verCliente/" + id;
+        
+        return "redirect:/site/verCliente/" + id;
     }
 
     @PostMapping("/verAgricultor/{id}")
     public String actualizarAgricultor(@PathVariable Integer id, @ModelAttribute("agricultorDto") CrearAgricultorDto dto, Model model) {
         agricultorService.actualizarAgricultor(id, dto);
 
-        return "redirect:/site/agricultor/verAgricultor/" + id;
+        return "redirect:/site/verAgricultor/" + id;
     }
 
     @GetMapping("/cambiarClave")

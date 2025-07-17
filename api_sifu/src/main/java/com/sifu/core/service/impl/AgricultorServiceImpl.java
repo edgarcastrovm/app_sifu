@@ -55,6 +55,8 @@ public class AgricultorServiceImpl implements AgricultorService {
         persona.setCorreo(registro.getCorreo());
         persona.setCedula(registro.getCedula());
         persona.setCelular(registro.getCelular());
+        persona.setProvincia(registro.getProvincia());
+    	persona.setCanton(registro.getCanton());
         Persona personaGuardado = personaService.crearPersona(persona);
         
         Usuario usuario = new Usuario();
@@ -103,7 +105,8 @@ public class AgricultorServiceImpl implements AgricultorService {
 		    // Validar campos no nulos
 		    if (agricultorDto.getNombre() == null || agricultorDto.getApellido() == null ||
 		    	agricultorDto.getCedula() == null || agricultorDto.getCorreo() == null ||
-		    	agricultorDto.getCelular() == null) {
+		    	agricultorDto.getCelular() == null || agricultorDto.getProvincia() == null || 
+		    	agricultorDto.getCanton()== null){
 		        throw new IllegalArgumentException("Todos los campos de persona son obligatorios");
 		    }
 
@@ -113,6 +116,8 @@ public class AgricultorServiceImpl implements AgricultorService {
 		    persona.setCedula(agricultorDto.getCedula());
 		    persona.setCorreo(agricultorDto.getCorreo());
 		    persona.setCelular(agricultorDto.getCelular());
+		    persona.setProvincia(agricultorDto.getProvincia());
+	    	persona.setCanton(agricultorDto.getCanton());
 
 		    personaService.actualizarPersona(persona.getId(), persona);
 

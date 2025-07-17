@@ -55,10 +55,32 @@
 											<input th:field="*{celular}" type="text" class="form-control" placeholder="Ingrese celular" required
 											id="celular" minlength="10" maxlength="10" pattern="^[0-9]{10}$" title="El celular debe tener exactamente 10 dígitos numéricos" aria-describedby="textHelp">
 									</div>
+									
+	
+									<div class="mb-3">
+									<label>Provincia:</label>
+									    <select id="provincia" name="provincia" class="form-select" aria-label="Default select example" required>
+									        <option value="">-- Seleccione --</option>
+									        <th:block th:each="prov : ${provincias}">
+									            <option th:value="${prov}" th:text="${prov}"></option>
+									        </th:block>
+									    </select>
+								    </div>
+								
+								    <div class="mb-3">
+									    <label>Cantón:</label>
+									    <select id="canton" name="canton" class="form-select" aria-label="Default select example" required>
+									        <option value="">-- Seleccione --</option>
+									    </select>
+									</div>
+																	    
 									<div class="mb-3">
 										<label for="alias" class="form-label">Alias</label> 
+										<div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 											<input th:field="*{alias}" type="text" class="form-control" placeholder="Ingrese alias o nombre de usuario" required
 											id="alias" aria-describedby="textHelp">
+											
+
 									</div>
 									<div class="mb-4">
 										<label for="clave" class="form-label">Contraseña</label>
@@ -77,6 +99,28 @@
 									
     
 								</form>
+								
+								<script th:inline="javascript">
+								    let cantonesPorProvincia = /*[[${cantonesPorProvincia}]]*/ {};
+								    let selectProvincia = document.getElementById('provincia');
+								    let selectCanton = document.getElementById('canton');
+								
+								    selectProvincia.addEventListener('change', function() {
+								        let provincia = this.value;
+								        let cantones = cantonesPorProvincia[provincia] || [];
+								
+								        // Limpiar cantones anteriores
+								        selectCanton.innerHTML = '<option value="">-- Seleccione --</option>';
+								
+								        cantones.forEach(function(canton) {
+								            let opt = document.createElement('option');
+								            opt.value = canton;
+								            opt.innerHTML = canton;
+								            selectCanton.appendChild(opt);
+								        });
+								    });
+								</script>
+								
 							</div>
 						</div>
 					</div>

@@ -56,6 +56,8 @@ public class ClienteServiceImpl implements ClienteService{
     	personaC.setCorreo(registroC.getCorreo());
     	personaC.setCedula(registroC.getCedula());
     	personaC.setCelular(registroC.getCelular());
+    	personaC.setProvincia(registroC.getProvincia());
+    	personaC.setCanton(registroC.getCanton());
     	Persona personaGuardadoC = personaService.crearPersona(personaC);
 		
     	Usuario usuarioC = new Usuario();
@@ -104,7 +106,8 @@ public class ClienteServiceImpl implements ClienteService{
 		    // Validar campos no nulos
 		    if (clienteDto.getNombre() == null || clienteDto.getApellido() == null ||
 		        clienteDto.getCedula() == null || clienteDto.getCorreo() == null ||
-		        clienteDto.getCelular() == null) {
+		        clienteDto.getCelular() == null || clienteDto.getProvincia() == null || 
+		        clienteDto.getCanton()== null) {
 		        throw new IllegalArgumentException("Todos los campos de persona son obligatorios");
 		    }
 
@@ -114,6 +117,8 @@ public class ClienteServiceImpl implements ClienteService{
 		    persona.setCedula(clienteDto.getCedula());
 		    persona.setCorreo(clienteDto.getCorreo());
 		    persona.setCelular(clienteDto.getCelular());
+		    persona.setProvincia(clienteDto.getProvincia());
+		    persona.setCanton(clienteDto.getCanton());
 
 		    personaService.actualizarPersona(persona.getId(), persona);
 
