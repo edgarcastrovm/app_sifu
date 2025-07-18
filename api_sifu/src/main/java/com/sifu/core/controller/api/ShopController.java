@@ -57,7 +57,7 @@ public class ShopController {
 
     @GetMapping("/agricultores/productos/{id}")
     public ResponseEntity<?> listarAgricultorByProductoId(@PathVariable Integer id) {
-
+        log.info("listarProductosAgricultor() called");
         return ResponseEntity.ok().body(shopService.listarAgricultorByProductoId(id));
     }
 
@@ -75,6 +75,7 @@ public class ShopController {
 
     @GetMapping("/cliente/my-cart")
     public ResponseEntity<?> verCarritoCliente(Authentication authentication) {
+        log.info("verCarritoCliente() called");
         if (authentication==null){
             log.error("No se puede agregar el carrito de producto necesita loguearse al sistema");
             return ResponseEntity.badRequest().body(ApiResponse.error(RC.FORBIDDEN,"Necesita estar logueado como cliente"));
@@ -82,5 +83,17 @@ public class ShopController {
         CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
         Usuario usuario = userDetails.getUsuario();
         return ResponseEntity.ok().body(shopService.verCarrito(usuario));
+    }
+
+    @DeleteMapping("/cliente/my-cart/producto/{idItem}")
+    public ResponseEntity<?> eliminarItemCarrito(Authentication authentication,@PathVariable Integer idItem) {
+        log.info("eliminarItemCarrito() called");
+        if (authentication==null){
+            log.error("No se puede eliminar producto necesita loguearse al sistema");
+            return ResponseEntity.badRequest().body(ApiResponse.error(RC.FORBIDDEN,"Necesita estar logueado como cliente"));
+        }
+        CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
+        Usuario usuario = userDetails.getUsuario();
+        return ResponseEntity.ok().body(shopService.eliminarItemCarrito(usuario,idItem));
     }
 }

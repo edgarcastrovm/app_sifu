@@ -2,6 +2,7 @@ package com.sifu.core.service.dominio;
 
 import com.sifu.core.config.http.ApiResponse;
 import com.sifu.core.config.http.RC;
+import com.sifu.core.constants.StateConstants;
 import com.sifu.core.repo.*;
 import com.sifu.core.utils.dto.*;
 import com.sifu.core.utils.dto.dominio.AgricultorByProductoDto;
@@ -12,9 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -150,6 +151,7 @@ public class ShopService implements IShopService {
         //Agregamos el item al carrito
 
         DetalleCarrito detalleCarrito = new DetalleCarrito();
+        detalleCarrito.setEstado(StateConstants.STATE_ACTIVE);
         detalleCarrito.setProducto(producto);
         detalleCarrito.setCarrito(carrito);
         detalleCarritoRepository.save(detalleCarrito);
@@ -180,7 +182,7 @@ public class ShopService implements IShopService {
         }
 
         //Obtenemos los items del carrito
-        List<DetalleCarrito> _items = detalleCarritoRepository.getDetalleCarritoByCarrito(carrito);
+        List<DetalleCarrito> _items = detalleCarritoRepository.getDetalleCarritoByEstadoAndCarrito(StateConstants.STATE_ACTIVE,carrito);
         List<DetalleCarritoDto> items;
         if(_items.size()>0){
             items = _items.stream().map(DetalleCarritoDto::new).collect(Collectors.toList());
@@ -188,6 +190,25 @@ public class ShopService implements IShopService {
             items = new ArrayList<>();
         }
         return ApiResponse.success(RC.OK,items);
+    }
+
+    public ApiResponse<String> eliminarItemCarrito(Usuario usuario, Integer itemId) {
+        log.info("eliminarItemCarrito() called");
+        Integer idCliente  = usuario.getPersona().getCliente().getId();
+        log.info(String.format("Cliente id: %d", idCliente));
+
+        ApiResponse apiResponse = detalleCarritoRepository.findById(itemId).map(itemDetalle -> {
+            if (itemDetalle.getCarrito().getCliente().getId().equals(idCliente)) {
+                itemDetalle.setEstado(StateConstants.STATE_INACTIVE);
+                itemDetalle.setFechaUpdate(LocalDateTime.now());
+                detalleCarritoRepository.save(itemDetalle);
+                return ApiResponse.success(RC.OK, "Item eliminado correctamente");
+            }else {
+                return ApiResponse.error(RC.FORBIDDEN, "El producto no pertence al cliente");
+            }
+        }).orElse(ApiResponse.error(RC.BAD_REQUEST, "El item no existe"));
+
+        return apiResponse;
     }
 
     public ApiResponse<List<AgricultorDto>> listarAgricultores() {

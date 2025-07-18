@@ -19,6 +19,20 @@
 
         const URL_BASE = getBaseUrl()
         console.log("URL_BASE", URL_BASE)
+
+        function BASE_64_TO_IMAGE(base64) {
+            if(!base64){
+                return ""
+            }
+            let mime = "application/octet-stream";
+            if (base64.startsWith("iVBORw0KGgo"))  mime = "image/png";
+            if (base64.startsWith("/9j/"))  mime = "image/jpeg";
+            if (base64.startsWith("R0lGOD"))  mime = "image/gif";
+            if (base64.startsWith("UklGR"))  mime = "image/webp";
+            if (base64.startsWith("PD94bWwgdmV"))  mime = "image/svg+xml";
+            return `data:${mime};base64,${base64}`;
+        }
+
     </script>
 </head>
 <body>
