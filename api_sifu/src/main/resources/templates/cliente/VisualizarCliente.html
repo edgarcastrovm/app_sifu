@@ -77,8 +77,7 @@
                         <label class="col-sm-2 col-form-label">Celular</label>
                         <div class="col-8">
                             <input type="text" class="form-control" th:field="*{celular}" readonly
-                                   required
-                                   minlength="10" maxlength="10" pattern="^[0-9]{10}$"
+                                   required minlength="10" maxlength="10" pattern="^[0-9]{10}$"
                                    title="El celular debe tener exactamente 10 dígitos numéricos"
                                    aria-describedby="textHelp">
                             <div class="text-danger" th:if="${#fields.hasErrors('celular')}"
@@ -87,6 +86,32 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="mb-3 row">
+						<label class="col-sm-2 col-form-label">Provincia:</label>
+						<div class="col-8">
+						<select id="provincia" name="provincia" class="form-select">
+						    <option value="">-- Seleccione --</option>
+						    <th:block th:each="prov : ${provincias}">
+						        <option th:value="${prov}" th:text="${prov}" th:selected="${prov} == ${clienteDto.provincia}">
+						        </option>
+						    </th:block>
+						</select>
+						</div>
+					</div>
+								
+					<div class="mb-3 row">
+						<label class="col-sm-2 col-form-label">Cantón:</label>
+						<div class="col-8">
+						<select id="canton" name="canton" class="form-select">
+						    <option value="">-- Seleccione --</option>
+						    <th:block th:each="canton : ${cantonesPorProvincia[clienteDto.provincia]}">
+						        <option th:value="${canton}" th:text="${canton}" th:selected="${canton} == ${clienteDto.canton}">
+						        </option>
+						    </th:block>
+						</select>
+						</div>
+						</div>
 
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" th:field="*{entidadSFL}"
@@ -111,20 +136,45 @@
         </div>
     </div>
 
-    <script>
-        function habilitarEdicion() {
-            const campos = document.querySelectorAll(".form-control");
-            campos.forEach(campo => campo.removeAttribute("readonly"));
+	<script th:inline="javascript">
+	    let cantonesPorProvincia = /*[[${cantonesPorProvincia}]]*/ {};
+	    let selectProvincia = document.getElementById('provincia');
+	    let selectCanton = document.getElementById('canton');
+	
+	    selectProvincia.addEventListener('change', function () {
+	        cargarCantonesPorProvincia(this.value);
+	    });
+	
+	    function cargarCantonesPorProvincia(provincia) {
+	        let cantones = cantonesPorProvincia[provincia] || [];
+	        selectCanton.innerHTML = '<option value="">-- Seleccione --</option>';
+	
+	        cantones.forEach(function (canton) {
+	            let opt = document.createElement('option');
+	            opt.value = canton;
+	            opt.innerHTML = canton;
+	            selectCanton.appendChild(opt);
+	        });
+	    }
+	
+	    function habilitarEdicion() {
+	        document.querySelectorAll(".form-control").forEach(campo => campo.removeAttribute("readonly"));
+	        document.querySelector("input[name='entidadSFL']").removeAttribute("disabled");
+	        document.querySelectorAll("select").forEach(select => select.removeAttribute("disabled"));
+	        document.getElementById("btnGuardar").disabled = false;
+	        document.getElementById("btnEditar").disabled = true;
+	
+	        // Cargar cantones de la provincia actual
+	        cargarCantonesPorProvincia(selectProvincia.value);
+	        // Seleccionar el cantón actual si ya existía
+	        let cantonActual = /*[[${clienteDto.canton}]]*/ '';
+	        if (cantonActual) {
+	            selectCanton.value = cantonActual;
+	        }
+	    }
+	</script>
 
-            const entidadCheckbox = document.querySelector("input[name='entidadSFL']");
-            if (entidadCheckbox) {
-                entidadCheckbox.removeAttribute("disabled");
-            }
-
-            document.getElementById("btnGuardar").disabled = false;
-            document.getElementById("btnEditar").disabled = true;
-        }
-    </script>
+    
 </div>
 </body>
 

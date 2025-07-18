@@ -3,6 +3,7 @@ package com.sifu.core.utils.dto.dominio;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -29,12 +30,18 @@ public class ActualizarClienteDto {
 	 private String correo;
 	 
 	 @NotBlank(message = "La cedula es obligatorio")
-	  @Size(min = 10, max = 10, message = "La cédula debe tener 10 dígitos")
+	 @Size(min = 10, max = 10, message = "La cédula debe tener 10 dígitos")
 	 private String cedula;
 	 
 	 @NotBlank(message = "El celular es obligatorio")
 	 @Size(min = 10, max = 10, message = "El celular debe tener 10 dígitos")
 	 private String celular;
+	 
+	 @Column(name = "provincia", nullable = false, length = 60)
+	 private String provincia;
+	    
+	 @Column(name = "canton", nullable = false, length = 60)
+	 private String canton;
 	 
 	 private Boolean entidadSFL;
 	 
@@ -45,6 +52,8 @@ public class ActualizarClienteDto {
 	        cedula = null;
 	        celular = null;
 	        entidadSFL = true;
+	        provincia= null;
+	        canton = null;
 	    }
 
 }

@@ -25,15 +25,22 @@ public class Persona {
     @Column(name = "apellido", nullable = false, length = 60)
     private String apellido;
 
-    @Pattern(regexp = "\\d{10}", message = "El número de celular debe tener exactamente 10 dígitos")
+    @Pattern(regexp = "\\d{10}", message = "El número de cedula debe tener exactamente 10 dígitos")
     @Column(name = "cedula", nullable = false, length = 10)
     private String cedula;
 
-    @Column(name = "correo", nullable = false, length = 50)
+    @Column(name = "correo", nullable = false, length = 60)
     private String correo;
 
-    @Column(name = "celular", nullable = false, length = 20)
+    @Pattern(regexp = "\\d{10}", message = "El número de celular debe tener exactamente 10 dígitos")
+    @Column(name = "celular", nullable = false, length = 10)
     private String celular;
+    
+    @Column(name = "provincia", nullable = false, length = 50)
+    private String provincia;
+    
+    @Column(name = "canton", nullable = false, length = 50)
+    private String canton;
 
 
     @OneToOne(mappedBy = "persona", cascade = CascadeType.ALL)

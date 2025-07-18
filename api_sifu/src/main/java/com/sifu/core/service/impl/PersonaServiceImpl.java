@@ -39,11 +39,13 @@ public class PersonaServiceImpl implements PersonaService {
 		log.info("Actualizando Persona ID {}: {} {}", id, persona.getNombre(), persona.getApellido());
 
 		personaExistente.setNombre(persona.getNombre());
-		personaExistente.setApellido(persona.getApellido());
-		personaExistente.setCedula(persona.getCedula());
-		personaExistente.setCelular(persona.getCelular());
-		personaExistente.setCorreo(persona.getCorreo());
-		return personaRepository.save(personaExistente);
+		personaExistente.setApellido(persona.getApellido()); 
+		personaExistente.setCedula(persona.getCedula()); 
+		personaExistente.setCelular(persona.getCelular()); 
+		personaExistente.setCorreo(persona.getCorreo()); 
+		personaExistente.setProvincia(persona.getProvincia().trim());
+		personaExistente.setCanton(persona.getCanton().trim());
+	    return personaRepository.save(personaExistente);
 	}
 
 }

@@ -38,31 +38,33 @@ public class AgricultorServiceImpl implements AgricultorService {
 		return agricultorRepository.findAll();
 	}
 
-	@Override
-	public Agricultor crearAgricultor(CrearAgricultorDto registro) {
+    @Override
+    public Agricultor crearAgricultor(CrearAgricultorDto registro) {
 		log.info("crearAgricultor() called");
-		// Verificar si el alias ya existe
-		Optional<Usuario> usuarioExistente = usuarioService.buscarPorAlias(registro.getAlias());
-		if (usuarioExistente.isPresent()) {
-			log.warn("Alias '{}' ya está registrado", registro.getAlias());
-			throw new IllegalArgumentException("El alias ya existe. Por favor, elige otro.");
-		}
-
-		Persona persona = new Persona();
-		persona.setNombre(registro.getNombre());
-		persona.setApellido(registro.getApellido());
-		persona.setCorreo(registro.getCorreo());
-		persona.setCedula(registro.getCedula());
-		persona.setCelular(registro.getCelular());
-		Persona personaGuardado = personaService.crearPersona(persona);
-
-		Usuario usuario = new Usuario();
-		usuario.setAlias(registro.getAlias());
-		log.info("Creando usuario: {}", usuario.getAlias());
-		usuario.setClave(registro.getClave());
-		log.info("Creando clave: {}", registro.getClave());
-		usuario.setPersona(personaGuardado);
-		usuario.setActivo(true);
+    	// Verificar si el alias ya existe
+        Optional<Usuario> usuarioExistente = usuarioService.buscarPorAlias(registro.getAlias());
+        if (usuarioExistente.isPresent()) {
+            log.warn("Alias '{}' ya está registrado", registro.getAlias());
+            throw new IllegalArgumentException("El alias ya existe. Por favor, elige otro.");
+        }
+        
+        Persona persona = new Persona();
+        persona.setNombre(registro.getNombre());
+        persona.setApellido(registro.getApellido());
+        persona.setCorreo(registro.getCorreo());
+        persona.setCedula(registro.getCedula());
+        persona.setCelular(registro.getCelular());
+        persona.setProvincia(registro.getProvincia());
+    	persona.setCanton(registro.getCanton());
+        Persona personaGuardado = personaService.crearPersona(persona);
+        
+        Usuario usuario = new Usuario();
+        usuario.setAlias(registro.getAlias());
+        log.info("Creando usuario: {}", usuario.getAlias());
+        usuario.setClave(registro.getClave());
+        log.info("Creando clave: {}" ,registro.getClave());
+        usuario.setPersona(personaGuardado);
+        usuario.setActivo(true);
 
 		Optional<Rol> rolAgricultor = rolRepository.findByNombre("AGRICULTOR");
 		if (!rolAgricultor.isPresent()) {
@@ -101,11 +103,11 @@ public class AgricultorServiceImpl implements AgricultorService {
 				.orElseThrow(() -> new RuntimeException("Agricultor no encontrado con ID: " + id));
 
 		Persona persona = agricultorExistente.getPersona();
-
 		// Validar campos no nulos
-		if (agricultorDto.getNombre() == null || agricultorDto.getApellido() == null
-				|| agricultorDto.getCedula() == null || agricultorDto.getCorreo() == null
-				|| agricultorDto.getCelular() == null) {
+		if (agricultorDto.getNombre() == null || agricultorDto.getApellido() == null ||
+			agricultorDto.getCedula() == null || agricultorDto.getCorreo() == null ||
+			agricultorDto.getCelular() == null || agricultorDto.getProvincia() == null ||
+			agricultorDto.getCanton()== null){
 			throw new IllegalArgumentException("Todos los campos de persona son obligatorios");
 		}
 
@@ -115,7 +117,8 @@ public class AgricultorServiceImpl implements AgricultorService {
 		persona.setCedula(agricultorDto.getCedula());
 		persona.setCorreo(agricultorDto.getCorreo());
 		persona.setCelular(agricultorDto.getCelular());
-
+		persona.setProvincia(agricultorDto.getProvincia());
+		persona.setCanton(agricultorDto.getCanton());
 		personaService.actualizarPersona(persona.getId(), persona);
 
 		return agricultorRepository.save(agricultorExistente);
