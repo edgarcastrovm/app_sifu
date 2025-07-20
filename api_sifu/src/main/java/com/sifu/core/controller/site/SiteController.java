@@ -2,6 +2,7 @@ package com.sifu.core.controller.site;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +60,7 @@ public class SiteController {
 	}
 
 	// Usuarios
+	@PreAuthorize("hasAuthority('CLIENTE')")
 	@GetMapping("/shop/mi-carrito")
 	public String carrito() {
 		log.info("carrito() called");

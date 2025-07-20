@@ -13,6 +13,8 @@ public class AgricultorByProductoDto {
     private String nombreAgricultor;
     private String correoAgricultor;
     private String telefonoAgricultor;
+    private String provincia;
+    private String canton;
     private Integer idProducto;
     private String nomnreProducto;
     private Integer idCategoria;
@@ -25,6 +27,8 @@ public class AgricultorByProductoDto {
                 + " " + entity.getAgricultor().getPersona().getApellido();
         this.correoAgricultor = entity.getAgricultor().getPersona().getCorreo();
         this.telefonoAgricultor = entity.getAgricultor().getPersona().getCelular();
+        this.provincia = entity.getAgricultor().getPersona().getProvincia();
+        this.canton = entity.getAgricultor().getPersona().getCanton();
         this.idProducto = entity.getProducto().getId();
         this.nomnreProducto = entity.getProducto().getNombre();
         this.idCategoria = entity.getProducto().getCategoriaProd().getId();

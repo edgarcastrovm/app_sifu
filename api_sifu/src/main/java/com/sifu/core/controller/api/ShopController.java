@@ -5,12 +5,15 @@ import com.sifu.core.config.http.RC;
 import com.sifu.core.service.dominio.ShopService;
 import com.sifu.core.service.security.CustomIUserDetails;
 import com.sifu.core.utils.dto.ProductoDto;
+import com.sifu.core.utils.dto.dominio.ItemCarritoDto;
 import com.sifu.core.utils.entity.Usuario;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/shop")
@@ -95,5 +98,34 @@ public class ShopController {
         CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
         Usuario usuario = userDetails.getUsuario();
         return ResponseEntity.ok().body(shopService.eliminarItemCarrito(usuario,idItem));
+    }
+
+    @PutMapping("/cliente/my-cart/producto/{idItem}")
+    public ResponseEntity<?> actualizarItemCarrito(Authentication authentication,
+                                                   @PathVariable Integer idItem,
+                                                   @RequestBody ItemCarritoDto item
+    ) {
+        log.info("actualizarItemCarrito() called");
+        if (authentication==null){
+            log.error("No se puede actualizar el producto necesita loguearse al sistema");
+            return ResponseEntity.badRequest().body(ApiResponse.error(RC.FORBIDDEN,"Necesita estar logueado como cliente"));
+        }
+        CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
+        Usuario usuario = userDetails.getUsuario();
+        return ResponseEntity.ok().body(shopService.actualizarItemCarrito(usuario,idItem, item));
+    }
+
+    @PostMapping("/cliente/my-cart/factura")
+    public ResponseEntity<?> facturarCarrito(Authentication authentication,
+                                                   @RequestBody List<ItemCarritoDto> items
+    ) {
+        log.info("facturarCarrito() called");
+        if (authentication==null){
+            log.error("No se puede facturar necesita loguearse al sistema");
+            return ResponseEntity.badRequest().body(ApiResponse.error(RC.FORBIDDEN,"Necesita estar logueado como cliente"));
+        }
+        CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
+        Usuario usuario = userDetails.getUsuario();
+        return ResponseEntity.ok().body(shopService.facturarItemsCarrito(usuario,items));
     }
 }

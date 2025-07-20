@@ -6,10 +6,11 @@
     <title>Perfil-Cliente</title>
 </head>
 <body>
-<div class="row" layout:fragment="content">
+<div class="row p-0" layout:fragment="content">
     <style>
         .txt-stock {
             max-width: 60px;
+            min-width: 60px;
             padding: 0 0 0 4px;
             border-radius: .2rem;
         }
@@ -19,15 +20,23 @@
             border-bottom: solid 1px #ccc;
             border-bottom-style: dashed;
         }
-        #content-lista{
+
+        #content-lista {
             overflow: auto;
-            max-height: calc(100vh - 15vh);
-            min-height: calc(100vh - 15vh);
+            max-height: calc(100vh - 10vh);
+            min-height: calc(100vh - 10vh);
+            margin: 0;
         }
+
+        #content-factura {
+            margin: 0;
+        }
+
         #lista-items-factura {
-            max-height: calc(100vh - 20vh);
-            min-height: calc(100vh - 20vh);
+            max-height: calc(100vh - 25vh);
+            min-height: calc(100vh - 25vh);
             overflow: auto;
+            margin: 0;
         }
 
         .image-product {
@@ -49,26 +58,85 @@
             width: 100%;
             /*object-fit: cover;    !* recorta si es necesario *!*/
         }
+
+        *[id$="accordionAgricultores"],
+        *[id$="accordionAgricultores"] .card .card-body {
+            padding: 0;
+        }
     </style>
     <div id="alerta" class="alert d-none" role="alert"></div>
-    <div class="row">
-        <div id="content-lista" class="col-md-6 col-lg-8">
+    <div class="row justify-content-between">
+        <div id="content-lista" class="card col-md-7 col-lg-8 p-2">
+            <div class="card-header">
+                Items esperando
+            </div>
             <ul class="list-group" id="lista-carrito"></ul>
         </div>
-        <div class="col-md-6 col-lg-4 card">
+        <div id="content-factura" class="card col-md-5 col-lg-4 p-2">
+            <div class="card-header">
+                Factura
+            </div>
             <ul class="list-group" id="lista-items-factura"></ul>
             <div class="mt-3 d-flex justify-content-between align-items-center">
-                <strong>Total seleccionado: <span id="total-general">$0.00</span></strong>
-                <button class="btn btn-primary" onclick="facturarSeleccionados()">Facturar Seleccionados</button>
+                <strong>Total: <span id="total-general">$0.00</span></strong>
+                <button class="btn btn-primary" onclick="facturarSeleccionados()">Facturar</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="facturaModal" tabindex="-1" aria-labelledby="facturaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header text-bg-primary">
+                    <h5 class="modal-title" id="facturaModalLabel">Factura creada exitosamente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <tbody>
+                        <tr>
+                            <th>Número de Factura</th>
+                            <td id="factura-numero"></td>
+                        </tr>
+                        <tr>
+                            <th>Cliente</th>
+                            <td id="factura-cliente"></td>
+                        </tr>
+                        <tr>
+                            <th>DNI</th>
+                            <td id="factura-dni"></td>
+                        </tr>
+                        <tr>
+                            <th>Fecha</th>
+                            <td id="factura-fecha"></td>
+                        </tr>
+                        <tr>
+                            <th>Valor Total</th>
+                            <td id="factura-valor"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>
 
-
     <script>
+        // modal total factura
+        const modal = new bootstrap.Modal(document.getElementById("facturaModal"));
         let carritoItems = [];
+        let itemCarritoSelected = {
+            id: 0,
+            idAgricultor: 0,
+            idProducto: 0,
+            idCategoria: 0,
+            cantidad: 0
+        }
 
-        function crearListaAgricultor(idItem, idProducto) {
+        function crearListaAgricultor(idItem, idProducto, itemData) {
 
             const container = document.getElementById(`${idItem}-accordionAgricultores`);
             container.innerHTML = '';
@@ -81,17 +149,9 @@
                     }
 
                     renderizarAccordion(json.data, idItem);
-                    llenarCombo(json.data, idItem);
+                    llenarCombo(json.data, idItem, itemData);
                 })
                 .catch(err => console.error('Error al cargar productores:', err));
-        }
-
-        function crearListaAgricultorOpt(elementId,itemId,productId){
-            const select = document.getElementById(elementId)
-            if(select.childElementCount==1) {
-                crearListaAgricultor(itemId, productId)
-            }
-            return true
         }
 
         function renderizarAccordion(data, idItem) {
@@ -108,11 +168,12 @@
                         <td>
                             <p class="item-detalle">${item.nombreAgricultor}</p>
                             <p class="item-detalle d-md-none d-lg-block">${item.correoAgricultor}</p>
-                            <p class="item-detalle">${item.telefonoAgricultor}</p>
+                            <p class="item-detalle">${item.provincia}</p>
+                            <p class="item-detalle">${item.canton}</p>
                         </td>
                         <td>${item.stock}</td>
                         <td>
-                            ${stockDisponible ? btn:'<span class="text-danger">Sin stock</span>'}
+                            ${stockDisponible ? btn : '<span class="text-danger">Sin stock</span>'}
                         </td>
                     </tr>`
             });
@@ -123,7 +184,7 @@
                     <div class="card-body">
                         <table class="table table-sm">
                             <thead>
-                                <th>Agricultor</th><th>Stock</th><th>Acción</th>
+                                <th>Agricultor</th><th>Stock</th><th>Seleccionar</th>
                             </thead>
                             <tbody>${itemsDisponibles}</tbody>
                         </table>
@@ -132,37 +193,72 @@
                 `
             container.append(card);
         }
-        function onChangeAgricultor(e) {
+
+        async function onChangeAgricultor(e) {
+            console.log("onChangeAgricultor(): ", e)
             const selectedOption = e.target.options[e.target.selectedIndex];
+            const txtCantidad = document.getElementById(`${selectedOption.dataset.iditem}-cantidad`)
             const nombre = selectedOption.dataset.nombre;
-            const stock = selectedOption.dataset.stock;
+            // const stock = selectedOption.dataset.stock;
+            let cantidad = txtCantidad.value
 
-            console.log("ID:", e.target.value);
-            console.log("Nombre:", nombre);
-            console.log("Stock:", stock);
+            itemCarritoSelected.id = parseInt(selectedOption.dataset.iditem)
+            itemCarritoSelected.idAgricultor = parseInt(selectedOption.value)
+            itemCarritoSelected.cantidad = parseInt(cantidad)
 
-            alert(`Agricultor ${nombre} seleccionado.`);
+            try {
+                console.log("onChangeAgricultor() itemCarritoSelected: ", itemCarritoSelected)
+                const res = await fetch(
+                    `${URL_BASE}/api/shop/cliente/my-cart/producto/${selectedOption.dataset.iditem}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(itemCarritoSelected)
+                    });
+                const json = await res.json();
+                console.log("onChangeAgricultor() json:", json)
+                if (!res.ok) {
+                    mostrarAlerta('danger', json.msg || 'Error al seleccionar el agricultor');
+                    throw new Error(json.msg);
+                }
+                const data = json.data
+                txtCantidad.value = data.cantidad
+            } catch (err) {
+                console.error("Error:", err);
+            }
+
+            mostrarAlerta('info', `Agricultor ${nombre} seleccionado.`);
         }
-        function llenarCombo(data, idItem) {
+
+        function llenarCombo(data, idItem, itemCarritoData) {
             const combo = document.getElementById(`${idItem}-comboAgricultor`);
-            combo.removeEventListener('change',onChangeAgricultor)
+            combo.removeEventListener('change', onChangeAgricultor)
             combo.innerHTML = `<option value="">-- Seleccione un agricultor --</option>`;
 
             const unicos = data.filter(d => d.stock > 0);
             unicos.forEach(d => {
                 const opt = document.createElement('option');
+                if (itemCarritoData.agriProd) {
+                    console.log("llenarCombo()", itemCarritoData.agriProd.agricultor.id)
+                    console.log("llenarCombo()", d.idAgricultor)
+                    if (d.idAgricultor == itemCarritoData.agriProd.agricultor.id) {
+                        opt.setAttribute('selected', true)
+                    }
+                }
+                opt.dataset.iditem = idItem
                 opt.dataset.stock = d.stock
                 opt.dataset.nombre = d.nombreAgricultor
                 opt.value = d.idAgricultor;
-                opt.textContent = `${d.nombreAgricultor} [stock:${ d.stock}]`;
+                opt.textContent = `${d.nombreAgricultor} [stock:${d.stock}]`;
                 combo.appendChild(opt);
             });
 
             combo.addEventListener("change", onChangeAgricultor);
         }
 
-
-        async function listarItems() {
+        async function obtenerItemsCarrido() {
             try {
                 const res = await fetch(`${URL_BASE}/api/shop/cliente/my-cart`);
                 const json = await res.json();
@@ -179,19 +275,16 @@
             }
         }
 
-
         function renderizarCarrito() {
             const lista = document.getElementById("lista-carrito");
-            const totalGeneral = document.getElementById("total-general");
             lista.innerHTML = "";
-
-            let totalSeleccionado = 0;
 
             carritoItems.forEach(item => {
                 console.log(item)
                 const cantidad = item.cantidad ?? 1;
                 const precio = item.producto.precio;
                 const subtotal = cantidad * precio;
+                const checked = false;
 
                 const li = document.createElement("li");
                 li.id = `${item.id}-producto`
@@ -204,8 +297,7 @@
                                 <label for="comboAgricultor" class="form-label">
                                 Agricultor: </label>
                             </div>
-                            <select id="${item.id}-comboAgricultor" class="form-select"
-                            onmousedown="crearListaAgricultorOpt('${item.id}-comboAgricultor',${item.id},${item.producto.id})">
+                            <select id="${item.id}-comboAgricultor" class="form-select">
                                 <option value="">-- Seleccione un agricultor --</option>
                             </select>
                             <div class="input-group-text">
@@ -243,41 +335,119 @@
                     </div>
                     <div class="m-2 d-flex flex-column">
                         <span>${item.producto.nombre}</span>
-                        <span>$${subtotal.toFixed(2)}</span>
+                        <span id="${item.id}-subtotal" >$${subtotal.toFixed(2)}</span>
+                        <span>$${precio.toFixed(2)}</span>
                         <div class="text-muted">${item.producto.categoriaProd.nombre}</div>
                         <div class="form-check form-switch">
-                          <input class="form-check-input check-item" type="checkbox" role="switch" id="${item.id}-chek" value="${item.id}" onchange="actualizarTotalSeleccionado()" />
+                          <input class="form-check-input check-item" type="checkbox" role="switch" id="${item.id}-chek"
+                          value="${item.id}" onchange="agregarItemListafactura(${item.id})"
+                           />
                           <label class="form-check-label" for="${item.id}-chek">Facturar</label>
                         </div>
                         <div class="m-2 d-flex align-items-center gap-2">
                             <button class="btn btn-sm btn-secondary" onclick="modificarCantidad(${item.id}, -1)">−</button>
-                            <input type="number" class="form-control txt-stock" min="1" max="999" id="${item.id}-cantidad" value="${cantidad}"/>
+                            <input type="number" class="form-control txt-stock" min="1" max="999"
+                            id="${item.id}-cantidad" value="${cantidad}" readonly />
                             <button class="btn btn-sm btn-secondary" onclick="modificarCantidad(${item.id}, 1)">+</button>
                             <button class="btn btn-sm btn-outline-danger ms-auto" onclick="eliminarItem(${item.id})">🗑</button>
                         </div>
                     </div>
                 </div>
             `;
-
                 lista.appendChild(li);
+                crearListaAgricultor(item.id, item.producto.id, item)
             });
-
-            actualizarTotalSeleccionado();
+            //onmousedown="crearListaAgricultorOpt('${item.id}-comboAgricultor',${item.id},${item.producto.id})"
+            actualizarTotalSeleccionado()
         }
 
-        function modificarCantidad(id, delta) {
-            // fetch(`${URL_BASE}/api/shop/update-item-cart/${id}?delta=${delta}`, {
-            //     method: 'PUT'
-            // })
-            //     .then(res => res.json())
-            //     .then(json => {
-            //         mostrarAlerta('success', json.msg || 'Cantidad actualizada');
-            //         listarItems();
-            //     })
-            //     .catch(err => console.error("Error al actualizar cantidad:", err));
-            const input = document.getElementById(`${id}-cantidad`)
-            input.value = parseInt(input.value) + delta
-            console.log(input.value)
+        async function modificarCantidad(idItem, delta) {
+
+            const selectElement = document.getElementById(`${idItem}-comboAgricultor`);
+            const selectedIndex = selectElement.selectedIndex;
+            const item = carritoItems.find(i => i.id === parseInt(idItem));
+
+            // Acceder al objeto <option> específico usando el índice
+            const selectedOption = selectElement.options[selectedIndex];
+            const txtCantidad = document.getElementById(`${idItem}-cantidad`)
+            const spanSubtotal = document.getElementById(`${idItem}-subtotal`)
+
+            console.log("modificarCantidad(): idAgricultor ", selectedOption)
+            // valida si el agricultor esta seleccionado
+            if (!selectedOption.value) {
+                mostrarAlerta('danger', 'Debe selecionar un agricultor')
+                return
+            }
+
+            const stock = parseInt(selectedOption.dataset.stock);
+            let cantidad = parseInt(txtCantidad.value) + delta
+
+            // valida si el stock es suficiente
+            if (stock < cantidad) {
+                mostrarAlerta('danger', 'El stock no es suficiente')
+                return
+            }
+
+            itemCarritoSelected.id = idItem
+            itemCarritoSelected.idAgricultor = parseInt(selectedOption.value)
+            itemCarritoSelected.cantidad = parseInt(cantidad)
+
+            try {
+                const res = await fetch(
+                    `${URL_BASE}/api/shop/cliente/my-cart/producto/${idItem}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(itemCarritoSelected)
+                    });
+                const json = await res.json();
+                console.log("onChangeAgricultor() json:", json)
+                if (!res.ok) {
+                    mostrarAlerta('danger', json.msg || 'Error al actualizar la cantidad');
+                    throw new Error(json.msg);
+                }
+                const data = json.data
+                txtCantidad.value = data.cantidad
+                const money = item.producto.precio * parseInt(data.cantidad)
+                spanSubtotal.innerHTML = `$${money.toFixed(2)}`
+            } catch (err) {
+                console.error("Error:", err);
+            }
+            actualizarTotalSeleccionado()
+        }
+
+        function agregarItemListafactura(idItem) {
+            console.log("Item a buscar", idItem)
+            const switchElement = document.getElementById(`${idItem}-chek`)
+            const listaFactura = document.getElementById("lista-items-factura")
+
+            const item = carritoItems.find(i => i.id === parseInt(idItem));
+            console.log("Item filtrado", item)
+            const input = document.getElementById(`${idItem}-cantidad`)
+            const cantidad = parseInt(input.value) ?? 1;
+            const precio = item.producto.precio;
+            const total = cantidad * precio;
+            if (switchElement.checked) {
+                const html = `
+                    <li id="${idItem}-item-factura"  class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                          <div class="fw-bold">${item.producto.nombre}</div>
+                          Precio unitario: ${item.producto.precio.toFixed(2)}
+                        </div>
+                        <span class="badge text-bg-primary"> Subtotal: ${total.toFixed(2)}</span>
+                    </li>
+                    `
+                const newitem = document.createElement("li")
+                newitem.innerHTML = html
+                listaFactura.append(newitem)
+            } else {
+                const itemLista = document.getElementById(`${idItem}-item-factura`)
+                if (itemLista) {
+                    itemLista.remove()
+                }
+            }
             actualizarTotalSeleccionado()
         }
 
@@ -290,7 +460,8 @@
                 .then(res => res.json())
                 .then(json => {
                     mostrarAlerta('info', json.msg || 'Producto eliminado');
-                    listarItems();
+                    document.getElementById("lista-carrito").innerHTML = "";
+                    obtenerItemsCarrido();
                 })
                 .catch(err => console.error("Error al eliminar:", err));
         }
@@ -311,7 +482,7 @@
             document.getElementById('total-general').textContent = `$${total.toFixed(2)}`;
         }
 
-        function facturarSeleccionados() {
+        async function facturarSeleccionados() {
             const checkboxes = document.querySelectorAll('.check-item:checked');
             const seleccionados = Array.from(checkboxes).map(cb => parseInt(cb.value));
 
@@ -319,11 +490,51 @@
                 alert("Seleccione al menos un producto para facturar.");
                 return;
             }
+            let listaItemsFactura = []
+            seleccionados.forEach(id => {
+                const comboAgricultor = document.getElementById(`${id}-comboAgricultor`)
+                const txtCantidad = document.getElementById(`${id}-cantidad`)
+                let itemCarritoFactura = {
+                    id: id,
+                    idAgricultor: comboAgricultor.value,
+                    idProducto: 0,
+                    cantidad: parseInt(txtCantidad.value)
+                }
+                listaItemsFactura.push(itemCarritoFactura)
+            })
+            // Enviamos la peticion para facturar
+            try {
+                const listaFactura = document.getElementById("lista-items-factura")
+                console.log("facturarSeleccionados() listaItemsFactura: ", listaItemsFactura)
+                const res = await fetch(
+                    `${URL_BASE}/api/shop/cliente/my-cart/factura`,
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(listaItemsFactura)
+                    });
+                const json = await res.json();
+                console.log("facturarSeleccionados() json:", json)
+                if (!res.ok) {
+                    mostrarAlerta('danger', json.msg || 'Error al facturar');
+                    throw new Error(json.msg);
+                }
+                if (json.code !=200){
+                    mostrarAlerta("danger", json.msg);
+                    return
+                }
+                listaFactura.innerHTML=""
+                const data = json.data
+                mostrarAlerta("info", data.msg);
+                mostrarFacturaModal(json)
+                obtenerItemsCarrido()
+            } catch (err) {
+                console.error("Error:", err);
+            }
 
             console.log("Facturando IDs:", seleccionados);
-            // Aquí puedes enviar los IDs seleccionados al backend:
-            // fetch(`${URL_BASE}/api/shop/facturar`, { method: 'POST', body: JSON.stringify(seleccionados) })
-            alert("Facturación simulada. Ver consola.");
         }
 
         function mostrarAlerta(tipo, mensaje) {
@@ -331,10 +542,23 @@
             alerta.className = `alert alert-${tipo}`;
             alerta.textContent = mensaje;
             alerta.classList.remove('d-none');
-            setTimeout(() => alerta.classList.add('d-none'), 3000);
+            setTimeout(() => alerta.classList.add('d-none'), 10000);
         }
 
-        document.addEventListener('DOMContentLoaded', listarItems);
+        function mostrarFacturaModal(response) {
+            const data = response.data;
+
+            document.getElementById("factura-numero").textContent = data.numero;
+            document.getElementById("factura-cliente").textContent = `${data.nombre} ${data.apellido}`;
+            document.getElementById("factura-dni").textContent = data.dni;
+            document.getElementById("factura-fecha").textContent = new Date(data.fecha).toLocaleString();
+            document.getElementById("factura-valor").textContent = parseFloat(data.valor).toFixed(2) + " $";
+
+            modal.show();
+        }
+
+        document.addEventListener('DOMContentLoaded', obtenerItemsCarrido);
+        
     </script>
 </div>
 </body>
