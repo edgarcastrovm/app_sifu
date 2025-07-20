@@ -2,6 +2,9 @@ package com.sifu.core.utils.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sifu.core.utils.entity.Producto;
+
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,9 +20,15 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductoDto implements Serializable {
     private Integer id;
+    
+    @NotNull(message = "El precio es obligatorio.")
+    @Min(value = 0, message = "El precio no puede ser negativo.")
     private Double precio;
+    
     private String nombre;
     private String image;
+    
+    @NotNull(message = "Debe seleccionar una categoría.")
     private CategoriaProdDto categoriaProd;
 
     public ProductoDto(Producto producto) {

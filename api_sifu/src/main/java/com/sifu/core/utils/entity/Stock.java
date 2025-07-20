@@ -26,12 +26,12 @@ public class Stock {
 	private String uniMedida;
 
 	@CreationTimestamp
-	@Temporal(TemporalType.TIMESTAMP)
+	//@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "fecha_creacion", updatable = false)
 	private LocalDateTime fechaCreacion;
 	
 	@OneToOne
-    @JoinColumn(name = "producto_id")
-    private AgriProd producto;
+    @JoinColumn(name = "agri_prod_id")
+    private AgriProd agriProd;
 	
 }
