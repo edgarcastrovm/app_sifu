@@ -25,6 +25,7 @@ public class ProductoDto implements Serializable {
         this.id = producto.getId();
         this.precio = producto.getPrecio();
         this.nombre = producto.getNombre();
+        
         if (producto.getCategoriaProd() != null) {
             this.categoriaProd = new CategoriaProdDto(producto.getCategoriaProd());
         }

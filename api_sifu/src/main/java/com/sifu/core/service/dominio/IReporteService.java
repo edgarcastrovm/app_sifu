@@ -4,4 +4,6 @@ import com.sifu.core.config.http.ApiResponse;
 
 public interface IReporteService {
     ApiResponse<?> ventas();
+    ApiResponse<?> productos();
+    
 }

@@ -37,4 +37,10 @@ public class AdminController {
     	log.info("resportes() called");
         return "/admin/reportes/reportes";
     }
+    
+    @GetMapping("/reportes-productos")
+    public String reporteProductos() {
+    	log.info("resportes() called");
+        return "/admin/reportes/reporte_productos";
+    }
 }
