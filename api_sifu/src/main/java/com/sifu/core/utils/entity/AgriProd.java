@@ -26,7 +26,7 @@ public class AgriProd {
     @JoinColumn(name = "producto_id")
     private Producto producto;
 
-    @OneToOne(mappedBy = "producto")
+    @OneToOne(mappedBy = "agriProd", cascade = CascadeType.ALL)
     private Stock stock;
 
     @Lob
