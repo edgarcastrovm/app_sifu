@@ -53,4 +53,9 @@ public class Utils {
         
         return mapa;
     }
+    public static List<String> obtenerMedidas() {
+        return Arrays.asList("Kilogramos", "Quintales", "Unidades", "Libras");
+    }
+
+    
 }
