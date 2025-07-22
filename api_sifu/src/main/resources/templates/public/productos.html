@@ -65,9 +65,21 @@
 
         <hr class="my-1">
 
+        <!-- Buscador -->
+        <form class="d-flex mb-3" th:action="@{/site/shop}" method="get">
+            <input class="form-control me-2"
+                   type="search"
+                   placeholder="Buscar productos..."
+                   aria-label="Buscar"
+                   name="query"
+                   th:value="${param.query}">
+            <button class="btn btn-outline-success" type="submit">Buscar</button>
+        </form>
+
         <h3 class="mb-1">Productos por Categoría</h3>
         <div id="productosContainer"></div>
     </div>
+
     <script>
         const imagenesPorDefecto = {
             "Frutas": "https://www.shutterstock.com/shutterstock/photos/2578716615/display_1500/stock-photo-tropical-fruits-are-fresh-sweet-and-full-of-flavor-juicy-mangoes-pineapples-and-bananas-bring-2578716615.jpg",
@@ -90,38 +102,32 @@
               `;
         }
 
-        // Agregar al carrito
         function agregarItem(id) {
-            producto = {
-                "id": id
-            }
+            const producto = { id };
             fetch(`${URL_BASE}/api/shop/add-item-cart`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(producto)
-                }
-            ).then(async res => {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(producto)
+            }).then(async res => {
                 const data = await res.json();
-
                 if (!res.ok) {
-                    // Mostrar mensaje de error personalizado
                     alert(`Error: ${data.msg}`);
                     throw new Error(data.msg);
                 }
-                // Si existe el mensaje o damos uno por defecto
                 alert(data.msg || "Agregado correctamente");
             }).catch(err => {
                 console.error("Error al agregar al carrito:", err);
             });
         }
 
-        // Crear card para producto
         function crearCardProducto(prod) {
+        //console.log(prod);
             const categoria = prod.categoriaProd?.nombre || 'Sin categoría';
             const imgUrl = imagenesPorDefecto[categoria] || 'https://via.placeholder.com/300x200.png?text=Producto';
+            //const imgUrl = prod.image;
             return `
                   <div class="col m-2">
                     <div class="item-producto card shadow-sm">
@@ -139,11 +145,8 @@
                 `;
         }
 
-        // Mostrar productos agrupados por categoría
         function renderProductosPorCategoria(productos) {
             const contenedor = document.getElementById('productosContainer');
-
-            // Agrupar productos por categoría
             const agrupado = {};
             productos.forEach(p => {
                 const cat = p.categoriaProd?.nombre || 'Sin categoría';
@@ -151,7 +154,6 @@
                 agrupado[cat].push(p);
             });
 
-            // Generar HTML
             contenedor.innerHTML = Object.entries(agrupado).map(([categoria, prods]) => `
                                   <h5 class="mt-4">${categoria}</h5>
                                   <div class="row">
@@ -160,20 +162,32 @@
                                 `).join('');
         }
 
+        // Obtener el parámetro "query" desde la URL
+        function getQueryParam() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('query') || '';
+        }
+
         // Cargar categorías
         fetch('http://localhost:8080/sifu/api/shop/categorias')
             .then(res => res.json())
             .then(json => {
                 const container = document.getElementById('carouselCategorias');
-                container.innerHTML = json.data.map(item => {
-                    return crearCardCategoria({id: item.id, nombre: item.nombre});
-                }).join('');
+                container.innerHTML = json.data.map(item => crearCardCategoria({id: item.id, nombre: item.nombre})).join('');
             });
 
-        // Cargar productos
+        // Cargar y filtrar productos
+        const query = getQueryParam();
         fetch('http://localhost:8080/sifu/api/shop/productos')
             .then(res => res.json())
-            .then(json => renderProductosPorCategoria(json.data));
+            .then(json => {
+                const productos = json.data;
+                console.log(productos);
+                const filtrados = query
+                    ? productos.filter(p => p.nombre.toLowerCase().includes(query.toLowerCase()))
+                    : productos;
+                renderProductosPorCategoria(filtrados);
+            });
     </script>
 </div>
 </body>
