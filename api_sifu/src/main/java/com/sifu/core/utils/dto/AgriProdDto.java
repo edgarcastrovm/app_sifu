@@ -18,6 +18,7 @@ import java.io.Serializable;
 public class AgriProdDto implements Serializable {
     private Integer id;
     private Integer stock;
+    private String image;
     private AgricultorDto agricultor;
     private ProductoDto producto;
 
@@ -28,6 +29,11 @@ public class AgriProdDto implements Serializable {
         }else {
             stock = 0;
         }
+        if (entity.getImage() != null) {
+            image = entity.getImage();
+        }else{
+            image = entity.getProducto().getImage();
+        }
         agricultor = new AgricultorDto(entity.getAgricultor());
         producto = new ProductoDto(entity.getProducto());
     }
@@ -35,6 +41,8 @@ public class AgriProdDto implements Serializable {
     public AgriProd toEntity() {
         AgriProd agriProd = new AgriProd();
         agriProd.setId(id);
+        agriProd.setImage(image);
+        agriProd.setProducto(producto.toEntity());
         agriProd.setAgricultor(agricultor.toEntity());
         return agriProd;
     }

@@ -22,6 +22,8 @@ public class PersonaDto implements Serializable {
     private String cedula;
     private String correo;
     private String celular;
+    private String provincia;
+    private String canton;
 
     public PersonaDto(Persona entiry) {
         this.nombre = entiry.getNombre();
@@ -29,7 +31,8 @@ public class PersonaDto implements Serializable {
         this.cedula = entiry.getCedula();
         this.correo = entiry.getCorreo();
         this.celular = entiry.getCelular();
-    }
+        this.provincia = entiry.getProvincia();
+        this.canton = entiry.getCanton();}
 
     public Persona  toEntity() {
         Persona persona = new Persona();
@@ -39,6 +42,8 @@ public class PersonaDto implements Serializable {
         persona.setCedula(this.cedula);
         persona.setCorreo(this.correo);
         persona.setCelular(this.celular);
+        persona.setProvincia(this.provincia);
+        persona.setCanton(this.canton);
         return persona;
     }
 }

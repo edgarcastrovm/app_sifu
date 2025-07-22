@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface DetalleCarritoRepository extends JpaRepository<DetalleCarrito, Integer> {
     List<DetalleCarrito> getDetalleCarritoByCarrito(Carrito carrito);
+
+    List<DetalleCarrito> getDetalleCarritoByEstadoAndCarrito(Integer estado, Carrito carrito);
 }

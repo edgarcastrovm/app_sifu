@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Error 500 - Error Interno</title>
+    <link rel="stylesheet" th:href="@{/assets/css/styles.min.css}"/>
+    <link rel="stylesheet" th:href="@{/assets/css/site.css}"/>
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+<div class="text-center">
+    <h1 class="display-1 text-danger">500</h1>
+    <h3 class="mb-3">Error interno del servidor</h3>
+    <p>Ha ocurrido un error inesperado. Intenta más tarde.</p>
+    <a th:href="@{/}" class="btn btn-primary mt-3">Ir al inicio</a>
+</div>
+</body>
+</html>

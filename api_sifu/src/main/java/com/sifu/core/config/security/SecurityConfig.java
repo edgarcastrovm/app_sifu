@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -39,6 +41,9 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutSuccessUrl("/site/home")
                         .permitAll()
+                )
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/error/403")
                 )
                 .userDetailsService(customUserDetailsService)
                 .csrf(csrf -> csrf.disable()); // Solo si usas APIs REST o formularios sin token CSRF

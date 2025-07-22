@@ -51,26 +51,28 @@ public class ClienteServiceImpl implements ClienteService {
 		}
 
 		Persona personaC = new Persona();
-		personaC.setNombre(registroC.getNombre());
-		personaC.setApellido(registroC.getApellido());
-		personaC.setCorreo(registroC.getCorreo());
-		personaC.setCedula(registroC.getCedula());
-		personaC.setCelular(registroC.getCelular());
-		Persona personaGuardadoC = personaService.crearPersona(personaC);
-
-		Usuario usuarioC = new Usuario();
-		usuarioC.setAlias(registroC.getAlias());
-		log.info("Creando usuario: {}", usuarioC.getAlias());
-		usuarioC.setClave(registroC.getClave());
-		log.info("Creando clave: {}", registroC.getClave());
-		usuarioC.setPersona(personaGuardadoC);
-		usuarioC.setActivo(true);
-
-		Optional<Rol> rolCliente = rolRepository.findByNombre("CLIENTE");
-		if (!rolCliente.isPresent()) {
-			throw new RuntimeException("No se encontró el rol 'CLIENTE'");
-		}
-		usuarioC.setRol(rolCliente.get());
+    	personaC.setNombre(registroC.getNombre());
+    	personaC.setApellido(registroC.getApellido());
+    	personaC.setCorreo(registroC.getCorreo());
+    	personaC.setCedula(registroC.getCedula());
+    	personaC.setCelular(registroC.getCelular());
+    	personaC.setProvincia(registroC.getProvincia());
+    	personaC.setCanton(registroC.getCanton());
+    	Persona personaGuardadoC = personaService.crearPersona(personaC);
+		
+    	Usuario usuarioC = new Usuario();
+    	usuarioC.setAlias(registroC.getAlias());
+    	log.info("Creando usuario: {}", usuarioC.getAlias());
+    	usuarioC.setClave(registroC.getClave()); 
+        log.info("Creando clave: {}" ,registroC.getClave());
+    	usuarioC.setPersona(personaGuardadoC);
+    	usuarioC.setActivo(true);
+    	
+    	Optional<Rol> rolCliente = rolRepository.findByNombre("CLIENTE");
+        if(! rolCliente.isPresent()) {
+        	throw new RuntimeException("No se encontró el rol 'CLIENTE'");
+        }
+        usuarioC.setRol(rolCliente.get());
 		usuarioService.crearUsuario(usuarioC);
 
 		Cliente cliente = new Cliente();
@@ -102,12 +104,13 @@ public class ClienteServiceImpl implements ClienteService {
 				.orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + id));
 
 		Persona persona = clienteExistente.getPersona();
-
-		// Validar campos no nulos
-		if (clienteDto.getNombre() == null || clienteDto.getApellido() == null || clienteDto.getCedula() == null
-				|| clienteDto.getCorreo() == null || clienteDto.getCelular() == null) {
-			throw new IllegalArgumentException("Todos los campos de persona son obligatorios");
-		}
+	    // Validar campos no nulos
+	    if (clienteDto.getNombre() == null || clienteDto.getApellido() == null ||
+	        clienteDto.getCedula() == null || clienteDto.getCorreo() == null ||
+	        clienteDto.getCelular() == null || clienteDto.getProvincia() == null ||
+	        clienteDto.getCanton()== null) {
+	        throw new IllegalArgumentException("Todos los campos de persona son obligatorios");
+	    }
 
 		// Actualizar campos de Persona
 		persona.setNombre(clienteDto.getNombre());
@@ -115,6 +118,8 @@ public class ClienteServiceImpl implements ClienteService {
 		persona.setCedula(clienteDto.getCedula());
 		persona.setCorreo(clienteDto.getCorreo());
 		persona.setCelular(clienteDto.getCelular());
+		persona.setProvincia(clienteDto.getProvincia());
+		persona.setCanton(clienteDto.getCanton());
 
 		personaService.actualizarPersona(persona.getId(), persona);
 

@@ -13,7 +13,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.sifu.core.controller.api")
 public class GlobalExceptionHandler {
 
     // Para errores de @Valid en @RequestBody
