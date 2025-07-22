@@ -330,7 +330,7 @@
                 <div class="ms-2 me-auto auto d-flex flex-sm-column flex-lg-row">
                     <div class="fw-bold d-flex flex-column justify-content-between">
                         <picture class="image-product mb-1">
-                            <img class="" src="${BASE_64_TO_IMAGE(item.producto.image)}"/>
+                            <img class="" src="${item.producto.image}"/>
                         </picture>
                     </div>
                     <div class="m-2 d-flex flex-column">
@@ -490,6 +490,9 @@
                 alert("Seleccione al menos un producto para facturar.");
                 return;
             }
+            const totalPagar =  document.getElementById('total-general').textContent
+            if (!confirm(`¿Esta seguro de proceder con el pago de ${totalPagar} ?`)) return;
+
             let listaItemsFactura = []
             seleccionados.forEach(id => {
                 const comboAgricultor = document.getElementById(`${id}-comboAgricultor`)

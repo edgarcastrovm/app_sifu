@@ -121,7 +121,7 @@
         // Crear card para producto
         function crearCardProducto(prod) {
             const categoria = prod.categoriaProd?.nombre || 'Sin categoría';
-            const imgUrl = imagenesPorDefecto[categoria] || 'https://via.placeholder.com/300x200.png?text=Producto';
+            const imgUrl = prod.image;
             return `
                   <div class="col m-2">
                     <div class="item-producto card shadow-sm">
