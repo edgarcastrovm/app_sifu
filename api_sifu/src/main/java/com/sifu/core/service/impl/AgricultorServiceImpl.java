@@ -2,20 +2,19 @@ package com.sifu.core.service.impl;
 
 import com.sifu.core.repo.AgricultorRepository;
 import com.sifu.core.repo.RolRepository;
-import com.sifu.core.service.AgricultorService;
-import com.sifu.core.service.PersonaService;
-import com.sifu.core.service.UsuarioService;
+import com.sifu.core.service.*;
+import com.sifu.core.service.google.GoogleCloudStorageService;
 import com.sifu.core.utils.dto.dominio.CrearAgricultorDto;
-import com.sifu.core.utils.entity.Agricultor;
-import com.sifu.core.utils.entity.Cliente;
-import com.sifu.core.utils.entity.Persona;
-import com.sifu.core.utils.entity.Rol;
-import com.sifu.core.utils.entity.Usuario;
+import com.sifu.core.utils.entity.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +29,17 @@ public class AgricultorServiceImpl implements AgricultorService {
 	@Autowired
 	private UsuarioService usuarioService;
 	@Autowired
+	private ProductoService productoService;
+	@Autowired
+	private StockService stockService;
+	@Autowired
 	private RolRepository rolRepository;
+    @Autowired
+    private AgriProdService agriProdService;
+    @Autowired
+    private CategoriaProdService categoriaProdService;
+    @Autowired
+    private GoogleCloudStorageService googleCloudStorageService;
 
 	@Override
 	public List<Agricultor> obtenerTodas() {
@@ -124,4 +133,65 @@ public class AgricultorServiceImpl implements AgricultorService {
 		return agricultorRepository.save(agricultorExistente);
 	}
 
+	public String  agregarProductoAricultor(Producto producto,
+										  String fileImage,
+										  Integer stockCantidad,
+										  String uniMedida,
+										  Integer agricultorId,
+										  RedirectAttributes redirectAttributes){
+
+		// Obtener lista de productos asociados a ese agricultor
+		List<AgriProd> listaProductos = agriProdService.findByAgricultor_Id(agricultorId);
+
+		// Validar si ya existe un producto con el mismo nombre para este agricultor
+		boolean existe = listaProductos.stream()
+				.anyMatch(ap -> ap.getProducto().getNombre().equalsIgnoreCase(producto.getNombre()));
+
+		if (existe) {
+			redirectAttributes.addFlashAttribute("error", "Ya tienes un producto con ese nombre.");
+			return "redirect:/agricultor/agregar-productos";
+		}
+
+		// Validar categoría del producto
+		CategoriaProd categoria = categoriaProdService.obtenerPorId(producto.getCategoriaProd().getId());
+		if (categoria == null) {
+			throw new RuntimeException("No se encontró la categoría de producto");
+		}
+		producto.setCategoriaProd(categoria);
+
+		// Guardar el producto nuevo
+		Producto nuevoProducto = productoService.crearProducto(producto);
+
+		// Guardar imagen como Base64 si se subió una
+		if ( fileImage != null && !fileImage.isEmpty() &&  fileImage.trim().length() > 0 ) {
+			//String base64 = Base64.getEncoder().encodeToString(fileImage.getBytes());
+			String name = nuevoProducto.getId()+"_producto";
+            try {
+                String urlImage = googleCloudStorageService.uploadBase64Image(fileImage,name);
+				producto.setImage(urlImage);
+			} catch (IOException e) {
+				log.error("Error al subir imagen de producto", e.getMessage());
+			}
+		}
+
+		// Obtener agricultor y crear nuevo AgriProd para la relación
+		Agricultor agricultor = obtenerPorId(agricultorId);
+		AgriProd agriProd = new AgriProd();
+		agriProd.setAgricultor(agricultor);
+		agriProd.setProducto(nuevoProducto);
+
+		// Configurar stock con la relación bidireccional
+		Stock stock = new Stock();
+		stock.setCantidad(stockCantidad);
+		stock.setUniMedida(uniMedida);
+		stock.setAgriProd(agriProd);
+
+		agriProd.setStock(stock);
+
+		// Guardar AgriProd
+		agriProdService.crearAgriProd(agriProd);
+
+		redirectAttributes.addFlashAttribute("success", "Producto registrado correctamente.");
+		return "redirect:/agricultor/agregar-productos";
+	}
 }

@@ -34,8 +34,9 @@ public class ShopService implements IShopService {
     private final DetalleCarritoRepository detalleCarritoRepository;
     private final FacturaRepository facturaRepository;
     private final DetalleFactRepository detalleFactRepository;
+    private final StockRepository stockRepository;
 
-    public ShopService(ProductoRepository productoRepository, CategoriaProdRepository categoriaProdRepository, AgricultorRepository agricultorRepository, AgriProdRepository agriProdRepository, ClienteRepository clienteRepository, CarritoRepository carritoRepository, DetalleCarritoRepository detalleCarritoRepository, FacturaRepository facturaRepository, DetalleFactRepository detalleFactRepository) {
+    public ShopService(ProductoRepository productoRepository, CategoriaProdRepository categoriaProdRepository, AgricultorRepository agricultorRepository, AgriProdRepository agriProdRepository, ClienteRepository clienteRepository, CarritoRepository carritoRepository, DetalleCarritoRepository detalleCarritoRepository, FacturaRepository facturaRepository, DetalleFactRepository detalleFactRepository, StockRepository stockRepository) {
         this.productoRepository = productoRepository;
         this.categoriaProdRepository = categoriaProdRepository;
         this.agricultorRepository = agricultorRepository;
@@ -45,6 +46,7 @@ public class ShopService implements IShopService {
         this.detalleCarritoRepository = detalleCarritoRepository;
         this.facturaRepository = facturaRepository;
         this.detalleFactRepository = detalleFactRepository;
+        this.stockRepository = stockRepository;
     }
 
     public ApiResponse<List<CategoriaProdDto>> listarCategorias() {
@@ -74,6 +76,21 @@ public class ShopService implements IShopService {
             log.error("No se encontraron productos");
             items = new ArrayList<>();
             return ApiResponse.error(RC.NOT_FOUND, items);
+        }
+    }
+
+    public ApiResponse<ProductoDto> listarProductoById(Integer id ) {
+        log.info("listarProductos() called");
+        Optional<Producto> itemsBase = productoRepository.findById(id);
+        ProductoDto item;
+        if (itemsBase.isPresent()) {
+            item = new ProductoDto(itemsBase.get());
+            log.info("Productos encontrados: {}", item);
+            return ApiResponse.success(item);
+        } else {
+            log.error("No se encontraron productos");
+            item = new ProductoDto();
+            return ApiResponse.error(RC.NOT_FOUND, item);
         }
     }
 
@@ -381,6 +398,12 @@ public class ShopService implements IShopService {
             //cambia estado del item del carrito a procesado
             detalleCarrito.setEstado(StateConstants.STATE_PROCESSED);
             detalleCarritoRepository.save(detalleCarrito);
+
+            //actualizamos stock
+            Stock stock = agriProd.getStock();
+            Integer stockDisponible = stock.getCantidad() - itemCarritoDto.getCantidad();
+            stock.setCantidad(stockDisponible);
+            stockRepository.save(stock);
         }
         factura.setTotal(total.doubleValue());
         facturaRepository.save(factura);

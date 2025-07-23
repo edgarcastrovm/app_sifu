@@ -63,6 +63,10 @@
         *[id$="accordionAgricultores"] .card .card-body {
             padding: 0;
         }
+        *[id$="-item-factura"] .badge.text-bg-primary{
+            width: 125px;
+            text-align: right;
+        }
     </style>
     <div id="alerta" class="alert d-none" role="alert"></div>
     <div class="row justify-content-between">
@@ -415,13 +419,25 @@
             } catch (err) {
                 console.error("Error:", err);
             }
+            agregarItemListafactura(idItem)
             actualizarTotalSeleccionado()
         }
 
         function agregarItemListafactura(idItem) {
+
             console.log("Item a buscar", idItem)
             const switchElement = document.getElementById(`${idItem}-chek`)
             const listaFactura = document.getElementById("lista-items-factura")
+
+            const selectElement = document.getElementById(`${idItem}-comboAgricultor`);
+            const selectedIndex = selectElement.selectedIndex;
+            const selectedOption = selectElement.options[selectedIndex];
+            // valida si el agricultor esta seleccionado
+            if (switchElement.checked && !selectedOption.value) {
+                mostrarAlerta('danger', 'Debe selecionar un agricultor')
+                switchElement.checked = false
+                return
+            }
 
             const item = carritoItems.find(i => i.id === parseInt(idItem));
             console.log("Item filtrado", item)
@@ -431,17 +447,29 @@
             const total = cantidad * precio;
             if (switchElement.checked) {
                 const html = `
-                    <li id="${idItem}-item-factura"  class="list-group-item d-flex justify-content-between align-items-start">
-                        <div class="ms-2 me-auto">
-                          <div class="fw-bold">${item.producto.nombre}</div>
-                          Precio unitario: ${item.producto.precio.toFixed(2)}
-                        </div>
-                        <span class="badge text-bg-primary"> Subtotal: ${total.toFixed(2)}</span>
-                    </li>
-                    `
-                const newitem = document.createElement("li")
-                newitem.innerHTML = html
-                listaFactura.append(newitem)
+                        <li id="${idItem}-item-factura"  class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                              <div class="fw-bold">${item.producto.nombre} : ${cantidad}</div>
+                              Precio unitario: ${item.producto.precio.toFixed(2)}
+                            </div>
+                            <span class="badge text-bg-primary"> Subtotal: ${total.toFixed(2)}</span>
+                        </li>
+                        `
+                const html2 = `
+                            <div class="ms-2 me-auto">
+                              <div class="fw-bold">${item.producto.nombre} : ${cantidad}</div>
+                              Precio unitario: ${item.producto.precio.toFixed(2)}
+                            </div>
+                            <span class="badge text-bg-primary"> Subtotal: ${total.toFixed(2)}</span>
+                        `
+                const itemLista = document.getElementById(`${idItem}-item-factura`)
+                if (itemLista) {
+                    itemLista.innerHTML = html2
+                } else {
+                    const newitem = document.createElement("li")
+                    newitem.innerHTML = html
+                    listaFactura.append(newitem)
+                }
             } else {
                 const itemLista = document.getElementById(`${idItem}-item-factura`)
                 if (itemLista) {
@@ -490,7 +518,7 @@
                 alert("Seleccione al menos un producto para facturar.");
                 return;
             }
-            const totalPagar =  document.getElementById('total-general').textContent
+            const totalPagar = document.getElementById('total-general').textContent
             if (!confirm(`¿Esta seguro de proceder con el pago de ${totalPagar} ?`)) return;
 
             let listaItemsFactura = []
@@ -524,11 +552,11 @@
                     mostrarAlerta('danger', json.msg || 'Error al facturar');
                     throw new Error(json.msg);
                 }
-                if (json.code !=200){
+                if (json.code != 200) {
                     mostrarAlerta("danger", json.msg);
                     return
                 }
-                listaFactura.innerHTML=""
+                listaFactura.innerHTML = ""
                 const data = json.data
                 mostrarAlerta("info", data.msg);
                 mostrarFacturaModal(json)
@@ -561,7 +589,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', obtenerItemsCarrido);
-        
+
     </script>
 </div>
 </body>

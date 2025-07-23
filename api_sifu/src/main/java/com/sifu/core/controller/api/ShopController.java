@@ -34,8 +34,13 @@ public class ShopController {
 
     @GetMapping("/productos")
     public ResponseEntity<?> listarProductos() {
-    	log.info("listarProductos() called");
+        log.info("listarProductos() called");
         return ResponseEntity.ok().body(shopService.listarProductos());
+    }
+    @GetMapping("/productos/{id}")
+    public ResponseEntity<?> listarProductoById(@PathVariable("id") Integer id) {
+        log.info("listarProductos() called");
+        return ResponseEntity.ok().body(shopService.listarProductoById(id));
     }
 
     @GetMapping("/productos/agricultor/{id}")

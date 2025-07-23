@@ -144,9 +144,9 @@ public class DataLoader implements CommandLineRunner {
             List<String> productos = listaProductos.get(i);
 
             for (String nombreProd : productos) {
-                Producto optProducto = productoRepository.findByNombre(nombreProd);
+                Optional<Producto> optProducto = productoRepository.findByNombre(nombreProd);
 
-                if (optProducto != null) {
+                if (optProducto.isPresent()) {
                     log.info("El producto ya existe");
                     continue;
                 }
@@ -164,7 +164,7 @@ public class DataLoader implements CommandLineRunner {
                 agriProdRepository.save(agriProd);
 
                 Stock stock = new Stock();
-                stock.setProducto(agriProd);
+                stock.setAgriProd(agriProd);
                 stock.setCantidad(100);
                 stock.setUniMedida("kg");
                 stockRepository.save(stock);
