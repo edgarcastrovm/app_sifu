@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Servicio para interactuar con Google Cloud Storage (GCS), específicamente para subir imágenes.
@@ -54,9 +56,10 @@ public class GoogleCloudStorageService {
         byte[] imageBytes = Base64.getDecoder().decode(base64Image);
 
         // 3. Determinar el tipo MIME de la imagen
-        String mimeType = determineMimeType(base64Data);
-        log.debug("Tipo MIME detectado para GCS: {}", mimeType);
-
+        //String mimeType = determineMimeType(base64Data);
+        String mimeType = getExtensionFromBase64(base64Data);
+        log.info("Tipo MIME detectado para GCS: {}", mimeType);
+        fileName = fileName + mimeType.replace("image/",".");
         // 4. Crear BlobId y BlobInfo para el archivo en GCS
         BlobId blobId = BlobId.of(bucketName, fileName);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
@@ -74,7 +77,7 @@ public class GoogleCloudStorageService {
         }
 
         // 6. Devolver la URL pública del archivo
-        return String.format("https://storage.googleapis.com/%s/%s.%s", bucketName, fileName,mimeType);
+        return String.format("https://storage.googleapis.com/%s/%s", bucketName, fileName);
     }
 
     /**
@@ -83,6 +86,28 @@ public class GoogleCloudStorageService {
      * @param base64Data La cadena Base64 completa con el prefijo "data:image/..."
      * @return El tipo MIME detectado (ej: "image/png", "image/jpeg"), o "application/octet-stream" por defecto.
      */
+
+    private static final Map<String, String> BASE64_EXTENSIONS = new HashMap<>();
+
+
+    public static String getExtensionFromBase64(String base64Data) {
+        BASE64_EXTENSIONS.put("/9j/", "image/jpeg");
+        BASE64_EXTENSIONS.put("iVBORw0KGgo", "image/png");
+        BASE64_EXTENSIONS.put("R0lGODdh", "image/gif");
+        BASE64_EXTENSIONS.put("R0lGODlh", "image/gif");
+        BASE64_EXTENSIONS.put("UklGR", "image/webp");
+        // Eliminar el prefijo si existe (ej: "data:image/jpeg;base64,")
+        String cleanBase64 = base64Data.split(",").length > 1 ? base64Data.split(",")[1] : base64Data;
+
+        for (Map.Entry<String, String> entry : BASE64_EXTENSIONS.entrySet()) {
+            if (cleanBase64.startsWith(entry.getKey())) {
+                return entry.getValue();
+            }
+        }
+        log.error("No se pudo determinar el tipo MIME exacto para GCS. Usando 'application/octet-stream' para la cadena Base64: {}", base64Data.substring(0, Math.min(base64Data.length(), 50)) + "...");
+        return "unknown"; // Extensión no reconocida
+    }
+
     private String determineMimeType(String base64Data) {
         if (base64Data.startsWith("data:image/jpeg")) {
             return "image/jpeg";

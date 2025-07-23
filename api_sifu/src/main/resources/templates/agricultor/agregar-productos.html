@@ -23,7 +23,7 @@
                     <div class="card-body">
                         <div class="mb-3">
                         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-                            <label for="nombreInput" class="form-label">Producto</label>
+                            <label for="nombre" class="form-label">Producto</label>
                             <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre nuevo producto" th:field="*{nombre}" required>
                         </div>
 
@@ -38,11 +38,11 @@
                         <div class="mb-3">
                             <label for="precio" class="form-label">Precio</label>
                             <input type="number" step="0.01" id="precio" class="form-control"
-                                   min="0.1" placeholder="Precio del producto" th:field="*{precio}" required>
+                                   min="0.1"  max="1000"  placeholder="Precio del producto" th:field="*{precio}" required>
                         </div>
                         <div class="mb-3">
-			                <label for="stock" class="form-label">Stock</label>
-								<input type="number" id="stockCantidad" class="form-control" min="1" name="stockCantidad" placeholder="Stock del producto" required>
+			                <label for="stockCantidad" class="form-label">Stock</label>
+								<input type="number" id="stockCantidad" class="form-control" min="1"  max="10000" name="stockCantidad" placeholder="Stock del producto" required>
 							</div>
 			            <div class="mb-3">
 			                <div class="mb-3">

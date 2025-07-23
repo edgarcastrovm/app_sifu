@@ -1,10 +1,12 @@
 package com.sifu.core.controller.site;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
+import com.sifu.core.service.google.GoogleCloudStorageService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +58,10 @@ public class AgricultorController {
 	private StockService stockService;
 	@Autowired
 	private CategoriaProdService categoriaProdService;
-	
-	
+    @Autowired
+    private GoogleCloudStorageService googleCloudStorageService;
+
+
 	@GetMapping("/agregar-productos")
     public String mostraraAgregarProd(Authentication authentication, Model model) {
 		
@@ -101,12 +105,6 @@ public class AgricultorController {
 	            return "redirect:/agricultor/agregar-productos";
 	        }
 
-	        // Guardar imagen como Base64 si se subió una
-	        if (!fileImage.isEmpty()) {
-	            String base64 = Base64.getEncoder().encodeToString(fileImage.getBytes());
-	            producto.setImage(base64);
-	        }
-
 	        // Validar categoría del producto
 	        CategoriaProd categoria = categoriaProdService.obtenerPorId(producto.getCategoriaProd().getId());
 	        if (categoria == null) {
@@ -116,6 +114,20 @@ public class AgricultorController {
 
 	        // Guardar el producto nuevo
 	        Producto nuevoProducto = productoService.crearProducto(producto);
+
+			// Guardar imagen como Base64 si se subió una
+			if (!fileImage.isEmpty()) {
+				String base64 = Base64.getEncoder().encodeToString(fileImage.getBytes());
+				log.info("Imagen producto base64:{}",base64);
+				String name = nuevoProducto.getId()+"_producto";
+				try {
+					String urlImage = googleCloudStorageService.uploadBase64Image(base64,name);
+					nuevoProducto.setImage(urlImage);
+					productoService.actualizarProducto(nuevoProducto.getId(),nuevoProducto);
+				} catch (IOException e) {
+					log.error("Error al subir imagen de producto", e.getMessage());
+				}
+			}
 
 	        // Obtener agricultor y crear nuevo AgriProd para la relación
 	        Agricultor agricultor = agricultorService.obtenerPorId(agricultorId);

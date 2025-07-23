@@ -72,12 +72,18 @@ public class ShopController {
     @PostMapping("/add-item-cart")
     public ResponseEntity<?> agregarItemCarrito(Authentication authentication, @RequestBody ProductoDto item) {
     	log.info("agreagrItemCarrito() called");
-        if (authentication==null){
+        if (authentication==null ){
             log.error("No se puede agregar el carrito de producto necesita loguearse al sistema");
             return ResponseEntity.badRequest().body(ApiResponse.error(RC.FORBIDDEN,"Necesita estar logueado como cliente"));
         }
         CustomIUserDetails userDetails = (CustomIUserDetails) authentication.getPrincipal();
         Usuario usuario = userDetails.getUsuario();
+
+        if(usuario.getPersona().getCliente() == null) {
+            log.error("No se encontro un cliente ligado a esta cuenta");
+            return ResponseEntity.badRequest().body(ApiResponse.error(RC.FORBIDDEN,"Necesita estar logueado como cliente"));
+        }
+
         return ResponseEntity.ok().body(shopService.agregarProductoAlCarrito(usuario, item));
     }
 

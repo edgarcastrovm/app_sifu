@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -81,8 +82,8 @@ public class DataLoader implements CommandLineRunner {
                 p.setApellido(nombre);
                 p.setCorreo(correo);
                 p.setCelular(celular);
-                p.setCanton("QUITO");
                 p.setProvincia("PICHINCHA");
+                p.setCanton("Quito");
                 return personaRepository.save(p);
             });
             log.info("Persona con cedula " + cedula + " registrado");
@@ -153,9 +154,13 @@ public class DataLoader implements CommandLineRunner {
                     continue;
                 }
                 log.info("Creando producto :{}", "https://storage.googleapis.com/sifu-images-app-bucket-2025/"+nombreProd+".png");
+                double numero = 1.50 + Math.random() * 3;// Precio entre 1.50 y 4.50
+                DecimalFormat df = new DecimalFormat("#.##");
+                String numeroRedondeado = df.format(numero);
+
                 Producto producto = new Producto();
                 producto.setNombre(nombreProd);
-                producto.setPrecio((1.50 + Math.random() * 3)); // Precio entre 1.50 y 4.50
+                producto.setPrecio(Double.parseDouble(numeroRedondeado));
                 producto.setCategoriaProd(categoria);
                 producto.setImage("https://storage.googleapis.com/sifu-images-app-bucket-2025/"+nombreProd+".png");
                 productoRepository.save(producto);
