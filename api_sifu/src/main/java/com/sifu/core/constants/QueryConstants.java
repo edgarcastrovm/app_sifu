@@ -28,7 +28,7 @@ public interface QueryConstants {
         JOIN tbl_cat_prod cp ON pr.categoria_id = cp.id
         JOIN tbl_agricultor a ON ap.agricultor_id = a.id
         JOIN tbl_persona pa ON a.persona_id = pa.id
-        LEFT JOIN tbl_stock s ON ap.id = s.producto_id
+        LEFT JOIN tbl_stock s ON ap.id = s.agri_prod_id
         ORDER BY f.fecha_creacion DESC, f.id, pr.nombre
     """;
 

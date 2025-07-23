@@ -6,7 +6,9 @@
 
     <div class="container-fluid">
         <!-- Formulario de fechas -->
+        <!-- 
         <form id="filtro-form" class="row g-3 mb-3">
+         
             <div class="col-md-3">
                 <label for="fechaDesde" class="form-label">Desde</label>
                 <input type="date" class="form-control" id="fechaDesde" name="desde">
@@ -18,7 +20,9 @@
             <div class="col-md-2 align-self-end">
                 <button type="submit" class="btn btn-primary w-100">Filtrar</button>
             </div>
+          
         </form>
+          -->
 
         <!-- Filtros por columnas -->
 <!--        <div class="row mb-3">-->
@@ -96,12 +100,12 @@
         }
         document.addEventListener("DOMContentLoaded", () => {
             const tbody = document.getElementById("tbody-reporte");
-
+/*
             const filtros = {
                 cliente: document.getElementById("filtroCliente"),
                 producto: document.getElementById("filtroProducto"),
                 agricultor: document.getElementById("filtroAgricultor")
-            };
+            };*/
 
             function cargarDatos(desde = "", hasta = "") {
                 let url = `http://localhost:8080/sifu/api/reporte`;
@@ -169,12 +173,12 @@
             // filtros.agricultor.addEventListener("input", aplicarFiltros);
 
             // Filtro por fechas (form)
-            document.getElementById("filtro-form").addEventListener("submit", e => {
+            /*document.getElementById("filtro-form").addEventListener("submit", e => {
                 e.preventDefault();
                 const desde = document.getElementById("fechaDesde").value;
                 const hasta = document.getElementById("fechaHasta").value;
                 cargarDatos(desde, hasta);
-            });
+            });*/
 
             // Carga inicial
             cargarDatos();
