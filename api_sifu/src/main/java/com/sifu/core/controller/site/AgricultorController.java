@@ -66,7 +66,7 @@ public class AgricultorController {
 	    
         Producto producto = new Producto();
         model.addAttribute("producto", producto);
-        model.addAttribute("agriProd", agriProdService.findByAgricultor_Id(id));
+        model.addAttribute("productos", productoService.listarTodoProductos());
         model.addAttribute("categorias", categoriaProdService.listarTodasCategorias());
         model.addAttribute("medidas", Utils.obtenerMedidas());
         return "agricultor/agregar-productos";
@@ -87,11 +87,13 @@ public class AgricultorController {
 	                                .getAgricultor()
 	                                .getId();
 
-	        // Obtener lista de productos asociados a ese agricultor
-	        List<AgriProd> listaProductos = agriProdService.findByAgricultor_Id(agricultorId);
+	        // Obtener lista de productos en general
+	        List<Producto> listaProductos = productoService.listarTodoProductos();
+	        // Obtener lista de productos solo del agricultor
+	        List <AgriProd> productosExistentes = agriProdService.findByAgricultor_Id(agricultorId);
 
 	        // Validar si ya existe un producto con el mismo nombre para este agricultor
-	        boolean existe = listaProductos.stream()
+	        boolean existe = productosExistentes.stream()
 	            .anyMatch(ap -> ap.getProducto().getNombre().equalsIgnoreCase(producto.getNombre()));
 
 	        if (existe) {

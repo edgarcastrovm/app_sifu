@@ -13,27 +13,25 @@
                 <label for="productoSelect" class="form-label">Producto</label>
                 <select id="productoSelect" class="form-select" name="productoId" th:field="*{id}">
                     <option value="" >-- Selecciona un producto existente --</option>
-                   <option th:data-nombre="${prod.producto.nombre}" th:each="prod : ${agriProd}" th:value="${prod.id}" th:text="${prod.producto.nombre}"></option>
+                   <option  th:data-nombre="${prod.nombre}"  th:data-precio="${prod.precio}" th:data-categoria="${prod.categoriaProd.id}" th:each="prod : ${productos}" th:value="${prod.id}" th:text="${prod.nombre}"></option>
       
            </select>
             </div>
             <div class="card"> 
             <br>
-            	<p>Agregar Nuevo Producto</p>
-                
-
+            	<h2 class="text-center mb-4">Agregar Producto</h2>
                     <div class="card-body">
                         <div class="mb-3">
                         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
                             <label for="nombreInput" class="form-label">Producto</label>
-                            <input type="text" id="nombreInput" name="nombre" class="form-control" placeholder="Nombre nuevo producto" th:field="*{nombre}" required>
+                            <input type="text" id="nombre" name="nombre" class="form-control" placeholder="Nombre nuevo producto" th:field="*{nombre}" required>
                         </div>
 
                         <div class="mb-3">
                             <label for="categoriaSelect" class="form-label">Categoría</label>
-                            <select id="categoriaSelect" class="form-select" name="categoriaId" th:field="*{categoriaProd.id}" required>
+                            <select id="categoriaSelect" class="form-select" name="categoriaProd.id" th:field="*{categoriaProd.id}" required>
                                 <option value="">-- Selecciona una categoria --</option>
-                                 <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}"></option>
+                                 <option th:each="cat : ${categorias}" th:value="${cat.id}" th:text="${cat.nombre}" ></option>
                             </select>
                         </div>
 
@@ -69,8 +67,44 @@
         <div id="mensaje" class="mt-3"></div>
     </div>
     <script th:inline="javascript">
-		let obtenerMedidas = /*[[${obtenerMedidas}]]*/ {};
-		let selectMedida = document.getElementById('medidas');
+		document.addEventListener('DOMContentLoaded', function () {
+	    const selectProducto = document.getElementById('productoSelect');
+	    const inputNombre = document.getElementById('nombre');
+	    const inputPrecio = document.getElementById('precio');
+	    const selectCategoria = document.getElementById('categoria');
+	
+	    selectProducto.addEventListener('change', function () {
+	        const selectedOption = this.options[this.selectedIndex];
+	
+	        const nombre = selectedOption.getAttribute('data-nombre');
+	        const precio = selectedOption.getAttribute('data-precio');
+	        const categoria = selectedOption.getAttribute('data-categoria');
+	
+	        if (nombre && precio && categoria) {
+	            inputNombre.value = nombre;
+	            inputPrecio.value = precio;
+	
+	            // ✅ Asignar la categoría correctamente
+	            let encontrada = false;
+	            [...selectCategoria.options].forEach(opt => {
+	                if (opt.value === categoria) {
+	                    opt.selected = true;
+	                    encontrada = true;
+	                }
+	            });
+	
+	            if (!encontrada) {
+	                selectCategoria.selectedIndex = 0; // Por si no la encuentra, selecciona la opción vacía
+	            }
+	
+	        } else {
+	            // Si es la opción vacía (ningún producto), limpiar campos
+	            inputNombre.value = '';
+	            inputPrecio.value = '';
+	            selectCategoria.selectedIndex = 0;
+	        }
+	    });
+	});
 		
 	</script>
 

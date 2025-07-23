@@ -8,9 +8,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.sifu.core.repo.AgricultorRepository;
 import com.sifu.core.repo.ProductoRepository;
+import com.sifu.core.service.AgriProdService;
 import com.sifu.core.service.CategoriaProdService;
 import com.sifu.core.service.ProductoService;
+import com.sifu.core.utils.entity.AgriProd;
+import com.sifu.core.utils.entity.Agricultor;
 import com.sifu.core.utils.entity.CategoriaProd;
 import com.sifu.core.utils.entity.Producto;
 
@@ -21,18 +25,32 @@ private static final Logger log = LogManager.getLogger(UsuarioServiceImpl.class)
 	
 	@Autowired
 	private ProductoRepository productoRepository;
+	@Autowired
+	private AgricultorRepository agricultorRepository;
 	
 	@Autowired
 	private CategoriaProdService categoriaProdService;
+	@Autowired
+	private AgriProdService agriProdService;
 
 	@Override
 	public Producto crearProducto(Producto producto) {
 		// TODO Auto-generated method stub
-		Optional<Producto> productoExistente = productoRepository.findByNombre(producto.getNombre());
-		if (productoExistente.isPresent()) {
+		//Optional<Producto> productoExistente = productoRepository.findByNombre(producto.getNombre());
+		Agricultor agricultor = new Agricultor();
+		List <AgriProd> productoExistente = agriProdService.findByAgricultor_Id(agricultor.getId());
+		boolean yaExiste = productoExistente.stream()
+			    .anyMatch(ap -> ap.getProducto().getNombre().equalsIgnoreCase(producto.getNombre()));
+
+			if (yaExiste) {
+			    log.warn("Producto '{}' ya está registrado", producto.getNombre());
+			    throw new IllegalArgumentException("El producto ya existe.");
+			}
+		
+		/*if (productoExistente.isPresent()) {
 			log.warn("Producto '{}' ya está registrado", producto.getNombre());
 			throw new IllegalArgumentException("El producto ya existe. ");
-		}
+		}*/
 		// Validar si la categoría existe correctamente
 	    if (producto.getCategoriaProd() == null || producto.getCategoriaProd().getId() == null) {
 	        throw new IllegalArgumentException("Debe seleccionar una categoría válida.");
