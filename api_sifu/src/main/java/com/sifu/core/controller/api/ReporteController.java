@@ -27,5 +27,12 @@ public class ReporteController {
         ApiResponse response = reporteService.ventas();
         return ResponseEntity.ok(response);
     }
-
+    
+    @GetMapping("/productos")
+    public ResponseEntity<?> productos(){
+    	log.info("productos() called");
+        ApiResponse response = reporteService.productos();
+        return ResponseEntity.ok(response);
+    }
+    
 }
