@@ -1,181 +1,179 @@
 <!DOCTYPE html>
 <html lang="es" layout:decorate="~{layout}"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
->
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <title>Perfil-Cliente</title>
+	<title>Perfil-Cliente</title>
 </head>
+
 <body>
-<div class="row" layout:fragment="content">
-    <div class="card mb-0">
-        <div class="card-body">
-            <div class="contenedor1">
-                <img th:src="@{/assets/images/logos/planta.png}" alt=""
-                     class="planta"/>
-            </div>
-            <div class="container mt-4">
-                <div class="text-center mt-4">
-                    <h2>Información del Cliente</h2>
-                </div>
+	<div class="row" layout:fragment="content">
+		<div class="card mb-0">
+			<div class="card-body">
+				<div class="contenedor1">
+					<img th:src="@{/assets/images/logos/planta.png}" alt="" class="planta" />
+				</div>
 
-                <form th:action="@{'/site/verCliente/' + ${clienteDto.id}}"
-                      th:object="${clienteDto}"
-                      method="post">
-                    <input type="hidden" th:field="*{id}"/>
-
-                    <div class="mb-3 row">
-                        <label class="col-sm-2 col-form-label">Nombre</label>
-                        <div class="col-8">
-                            <input type="text" class="form-control" th:field="*{nombre}" readonly
-                                   required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('nombre')}"
-                                 th:errors="*{nombre}">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <label class="col-sm-2 col-form-label">Apellido</label>
-                        <div class="col-8">
-                            <input type="text" class="form-control" th:field="*{apellido}" readonly
-                                   required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('apellido')}"
-                                 th:errors="*{apellido}">
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <label class="col-sm-2 col-form-label">Cédula</label>
-                        <div class="col-8">
-                            <input type="text" class="form-control" th:field="*{cedula}" readonly
-                                   required
-                                   minlength="10" maxlength="10" pattern="^[0-9]{10}$"
-                                   title="La cédula debe tener exactamente 10 dígitos numéricos"
-                                   aria-describedby="textHelp">
-                            <div class="text-danger" th:if="${#fields.hasErrors('cedula')}"
-                                 th:errors="*{cedula}">
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <label class="col-sm-2 col-form-label">Correo</label>
-                        <div class="col-8">
-                            <input type="email" class="form-control" th:field="*{correo}" readonly
-                                   required>
-                            <div class="text-danger" th:if="${#fields.hasErrors('correo')}"
-                                 th:errors="*{correo}">
-
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mb-3 row">
-                        <label class="col-sm-2 col-form-label">Celular</label>
-                        <div class="col-8">
-                            <input type="text" class="form-control" th:field="*{celular}" readonly
-                                   required minlength="10" maxlength="10" pattern="^[0-9]{10}$"
-                                   title="El celular debe tener exactamente 10 dígitos numéricos"
-                                   aria-describedby="textHelp">
-                            <div class="text-danger" th:if="${#fields.hasErrors('celular')}"
-                                 th:errors="*{celular}">
-
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3 row">
-						<label class="col-sm-2 col-form-label">Provincia:</label>
-						<div class="col-8">
-						<select id="provincia" name="provincia" class="form-select">
-						    <option value="">-- Seleccione --</option>
-						    <th:block th:each="prov : ${provincias}">
-						        <option th:value="${prov}" th:text="${prov}" th:selected="${prov} == ${clienteDto.provincia}">
-						        </option>
-						    </th:block>
-						</select>
-						</div>
+				<div class="container mt-4">
+					<div class="text-center mt-4">
+						<h2>Información del Cliente</h2>
 					</div>
-								
-					<div class="mb-3 row">
-						<label class="col-sm-2 col-form-label">Cantón:</label>
-						<div class="col-8">
-						<select id="canton" name="canton" class="form-select">
-						    <option value="">-- Seleccione --</option>
-						    <th:block th:each="canton : ${cantonesPorProvincia[clienteDto.provincia]}">
-						        <option th:value="${canton}" th:text="${canton}" th:selected="${canton} == ${clienteDto.canton}">
-						        </option>
-						    </th:block>
-						</select>
+
+					<form th:action="@{'/site/verCliente/' + ${clienteDto.id}}"
+						th:object="${clienteDto}" method="post">
+						<input type="hidden" th:field="*{id}" />
+
+						<!-- Nombre -->
+						<div class="mb-3 row">
+							<label class="col-sm-2 col-form-label">Nombre</label>
+							<div class="col-8">
+								<input type="text" class="form-control" th:field="*{nombre}" readonly required />
+								<div class="text-danger" th:errors="*{nombre}" th:if="${#fields.hasErrors('nombre')}"></div>
+							</div>
 						</div>
+
+						<!-- Apellido -->
+						<div class="mb-3 row">
+							<label class="col-sm-2 col-form-label">Apellido</label>
+							<div class="col-8">
+								<input type="text" class="form-control" th:field="*{apellido}" readonly required />
+								<div class="text-danger" th:errors="*{apellido}" th:if="${#fields.hasErrors('apellido')}"></div>
+							</div>
 						</div>
 
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" th:field="*{entidadSFL}"
-                               disabled value="false">
-                        <label class="form-check-label">Entidad sin fines de lucro</label>
-                    </div>
+						<!-- Cédula -->
+						<div class="mb-3 row">
+							<label class="col-sm-2 col-form-label">Cédula</label>
+							<div class="col-8">
+								<input type="text" class="form-control" th:field="*{cedula}" readonly required minlength="10" maxlength="10"
+									pattern="^[0-9]{10}$"
+									title="La cédula debe tener exactamente 10 dígitos numéricos" />
+								<div class="text-danger" th:errors="*{cedula}" th:if="${#fields.hasErrors('cedula')}"></div>
+							</div>
+						</div>
 
+						<!-- Correo -->
+						<div class="mb-3 row">
+							<label class="col-sm-2 col-form-label">Correo</label>
+							<div class="col-8">
+								<input type="email" class="form-control" th:field="*{correo}" readonly required />
+								<div class="text-danger" th:errors="*{correo}" th:if="${#fields.hasErrors('correo')}"></div>
+							</div>
+						</div>
 
-                    <div class="text-center mt-4">
-                        <button type="button" id="btnEditar" class="btn btn-warning"
-                                onclick="habilitarEdicion()" title="Editar">
-                            <iconify-icon icon="mdi:pencil" width="24" height="24"></iconify-icon>
-                        </button>
-                        <button type="submit" id="btnGuardar" class="btn btn-success" disabled>
-                            <iconify-icon icon="mdi:content-save" width="22"
-                                          height="22"></iconify-icon>
-                        </button>
-                        <a th:href="@{/site/}" class="btn btn-secondary">Volver</a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+						<!-- Celular -->
+						<div class="mb-3 row">
+							<label class="col-sm-2 col-form-label">Celular</label>
+							<div class="col-8">
+								<input type="text" class="form-control" th:field="*{celular}" readonly required minlength="10" maxlength="10"
+									pattern="^[0-9]{10}$"
+									title="El celular debe tener exactamente 10 dígitos numéricos" />
+								<div class="text-danger" th:errors="*{celular}" th:if="${#fields.hasErrors('celular')}"></div>
+							</div>
+						</div>
 
-	<script th:inline="javascript">
-	    let cantonesPorProvincia = /*[[${cantonesPorProvincia}]]*/ {};
-	    let selectProvincia = document.getElementById('provincia');
-	    let selectCanton = document.getElementById('canton');
-	
-	    selectProvincia.addEventListener('change', function () {
-	        cargarCantonesPorProvincia(this.value);
-	    });
-	
-	    function cargarCantonesPorProvincia(provincia) {
-	        let cantones = cantonesPorProvincia[provincia] || [];
-	        selectCanton.innerHTML = '<option value="">-- Seleccione --</option>';
-	
-	        cantones.forEach(function (canton) {
-	            let opt = document.createElement('option');
-	            opt.value = canton;
-	            opt.innerHTML = canton;
-	            selectCanton.appendChild(opt);
-	        });
-	    }
-	
-	    function habilitarEdicion() {
-	        document.querySelectorAll(".form-control").forEach(campo => campo.removeAttribute("readonly"));
-	        document.querySelector("input[name='entidadSFL']").removeAttribute("disabled");
-	        document.querySelectorAll("select").forEach(select => select.removeAttribute("disabled"));
-	        document.getElementById("btnGuardar").disabled = false;
-	        document.getElementById("btnEditar").disabled = true;
-	
-	        // Cargar cantones de la provincia actual
-	        cargarCantonesPorProvincia(selectProvincia.value);
-	        // Seleccionar el cantón actual si ya existía
-	        let cantonActual = /*[[${clienteDto.canton}]]*/ '';
-	        if (cantonActual) {
-	            selectCanton.value = cantonActual;
-	        }
-	    }
-	</script>
+						<!-- Provincia -->
+						<div class="mb-3 row">
+							<label class="col-sm-2 col-form-label">Provincia:</label>
+							<div class="col-8">
+								<select id="provincia" name="provincia" class="form-select">
+									<option value="">-- Seleccione --</option>
+									<th:block th:each="prov : ${provincias}">
+										<option th:value="${prov}" th:text="${prov}" th:selected="${prov} == ${clienteDto.provincia}"></option>
+									</th:block>
+								</select>
+							</div>
+						</div>
 
-    
-</div>
+						<!-- Cantón -->
+						<div class="mb-3 row">
+							<label class="col-sm-2 col-form-label">Cantón:</label>
+							<div class="col-8">
+								<select id="canton" name="canton" class="form-select" th:disabled="${modoVisualizacion}">
+									<option value="">-- Seleccione --</option>
+									<th:block th:if="${clienteDto.provincia != null}">
+										<th:block th:each="canton : ${cantonesPorProvincia[clienteDto.provincia]}">
+											<option th:value="${canton}" th:text="${canton}" th:selected="${canton} == ${clienteDto.canton}"></option>
+										</th:block>
+									</th:block>
+								</select>
+							</div>
+						</div>
+
+						<!-- Entidad SFL -->
+						<div class="mb-3 form-check">
+							<input type="checkbox" class="form-check-input" th:field="*{entidadSFL}" disabled />
+							<label class="form-check-label">Entidad sin fines de lucro</label>
+						</div>
+
+						<!-- Botones -->
+						<div class="text-center mt-4">
+							<button type="button" id="btnEditar" class="btn btn-warning" onclick="habilitarEdicion()" title="Editar">
+								<iconify-icon icon="mdi:pencil" width="24" height="24"></iconify-icon>
+							</button>
+							<button type="submit" id="btnGuardar" class="btn btn-success" disabled>
+								<iconify-icon icon="mdi:content-save" width="22" height="22"></iconify-icon>
+							</button>
+							<a th:href="@{/site/}" class="btn btn-secondary">Volver</a>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<!-- JS -->
+		<script th:inline="javascript">
+			let cantonesPorProvincia = /*[[${cantonesPorProvincia}]]*/ {};
+			let selectProvincia = document.getElementById('provincia');
+			let selectCanton = document.getElementById('canton');
+
+			selectProvincia.addEventListener('change', function () {
+				cargarCantonesPorProvincia(this.value);
+			});
+
+			function cargarCantonesPorProvincia(provincia) {
+				let cantones = cantonesPorProvincia[provincia] || [];
+				selectCanton.innerHTML = '<option value="">-- Seleccione --</option>';
+
+				cantones.forEach(function (canton) {
+					let opt = document.createElement('option');
+					opt.value = canton;
+					opt.innerHTML = canton;
+					selectCanton.appendChild(opt);
+				});
+			}
+
+			function habilitarEdicion() {
+				document.querySelectorAll(".form-control").forEach(campo => campo.removeAttribute("readonly"));
+				document.querySelector("input[name='entidadSFL']").removeAttribute("disabled");
+				document.querySelectorAll("select").forEach(select => select.removeAttribute("disabled"));
+				document.getElementById("btnGuardar").disabled = false;
+				document.getElementById("btnEditar").disabled = true;
+
+				// Cargar cantones de la provincia actual
+				cargarCantonesPorProvincia(selectProvincia.value);
+
+				// Seleccionar el cantón actual si ya existía
+				let cantonActual = /*[[${clienteDto.canton}]]*/ '';
+				if (cantonActual) {
+					selectCanton.value = cantonActual;
+				}
+			}
+
+			document.addEventListener('DOMContentLoaded', function () {
+				let provinciaActual = selectProvincia.value;
+				let cantonActual = /*[[${clienteDto.canton}]]*/ '';
+
+				if (provinciaActual && cantonActual) {
+					cargarCantonesPorProvincia(provinciaActual);
+					setTimeout(() => {
+						selectCanton.value = cantonActual;
+					}, 50);
+				}
+			});
+		</script>
+	</div>
 </body>
 
 </html>

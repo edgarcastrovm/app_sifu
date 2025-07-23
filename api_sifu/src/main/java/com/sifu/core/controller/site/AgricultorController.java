@@ -5,7 +5,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-import com.sifu.core.service.impl.AgricultorServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,11 +51,13 @@ public class AgricultorController {
 	@Autowired
 	private AgriProdService agriProdService;
 	@Autowired
+	private ProductoService productoService;
+	@Autowired
+	private StockService stockService;
+	@Autowired
 	private CategoriaProdService categoriaProdService;
-    @Autowired
-    private AgricultorServiceImpl agricultorServiceImpl;
-
-
+	
+	
 	@GetMapping("/agregar-productos")
     public String mostraraAgregarProd(Authentication authentication, Model model) {
 		
@@ -65,7 +66,7 @@ public class AgricultorController {
 	    
         Producto producto = new Producto();
         model.addAttribute("producto", producto);
-        model.addAttribute("agriProd", agriProdService.findByAgricultor_Id(id));
+        model.addAttribute("productos", productoService.listarTodoProductos());
         model.addAttribute("categorias", categoriaProdService.listarTodasCategorias());
         model.addAttribute("medidas", Utils.obtenerMedidas());
         return "agricultor/agregar-productos";
@@ -73,35 +74,68 @@ public class AgricultorController {
 
 	@PostMapping("/agregar-productos")
 	public String agregarProducto(@ModelAttribute Producto producto,
-	                              @RequestParam("fileImage") String fileImage,
+	                              @RequestParam("fileImage") MultipartFile fileImage,
 	                              @RequestParam("stockCantidad") Integer stockCantidad,
 	                              @RequestParam("uniMedida") String uniMedida,
 	                              Authentication authentication,
 	                              RedirectAttributes redirectAttributes) {
-		log.info("agregarProducto() called");
-		Integer agricultorId = 0;
-		try{
-			// Obtener ID del agricultor autenticado
-			 agricultorId = ((CustomIUserDetails) authentication.getPrincipal())
-					.getUsuario()
-					.getPersona()
-					.getAgricultor()
-					.getId();
-
-			 if (agricultorId == null) {
-				 redirectAttributes.addFlashAttribute("error", "Error al registrar producto el usuario debe esta logueado como agricultor " );
-			 }
-		}catch (Exception e) {
-			redirectAttributes.addFlashAttribute("error", "Error al registrar producto el usuario debe esta logueado como agricultor " );
-		}
 	    try {
-			return agricultorServiceImpl.agregarProductoAricultor(producto,
-					fileImage,
-					stockCantidad,
-					uniMedida,
-					agricultorId,
-					redirectAttributes
-			);
+	        // Obtener ID del agricultor autenticado
+	        Integer agricultorId = ((CustomIUserDetails) authentication.getPrincipal())
+	                                .getUsuario()
+	                                .getPersona()
+	                                .getAgricultor()
+	                                .getId();
+
+	        // Obtener lista de productos en general
+	        List<Producto> listaProductos = productoService.listarTodoProductos();
+	        // Obtener lista de productos solo del agricultor
+	        List <AgriProd> productosExistentes = agriProdService.findByAgricultor_Id(agricultorId);
+
+	        // Validar si ya existe un producto con el mismo nombre para este agricultor
+	        boolean existe = productosExistentes.stream()
+	            .anyMatch(ap -> ap.getProducto().getNombre().equalsIgnoreCase(producto.getNombre()));
+
+	        if (existe) {
+	            redirectAttributes.addFlashAttribute("error", "Ya tienes un producto con ese nombre.");
+	            return "redirect:/agricultor/agregar-productos";
+	        }
+
+	        // Guardar imagen como Base64 si se subió una
+	        if (!fileImage.isEmpty()) {
+	            String base64 = Base64.getEncoder().encodeToString(fileImage.getBytes());
+	            producto.setImage(base64);
+	        }
+
+	        // Validar categoría del producto
+	        CategoriaProd categoria = categoriaProdService.obtenerPorId(producto.getCategoriaProd().getId());
+	        if (categoria == null) {
+	            throw new RuntimeException("No se encontró la categoría de producto");
+	        }
+	        producto.setCategoriaProd(categoria);
+
+	        // Guardar el producto nuevo
+	        Producto nuevoProducto = productoService.crearProducto(producto);
+
+	        // Obtener agricultor y crear nuevo AgriProd para la relación
+	        Agricultor agricultor = agricultorService.obtenerPorId(agricultorId);
+	        AgriProd agriProd = new AgriProd();
+	        agriProd.setAgricultor(agricultor);
+	        agriProd.setProducto(nuevoProducto);
+
+	        // Configurar stock con la relación bidireccional
+	        Stock stock = new Stock();
+	        stock.setCantidad(stockCantidad);
+	        stock.setUniMedida(uniMedida);
+	        stock.setAgriProd(agriProd);
+
+	        agriProd.setStock(stock);
+
+	        // Guardar AgriProd
+	        agriProdService.crearAgriProd(agriProd);
+
+	        redirectAttributes.addFlashAttribute("success", "Producto registrado correctamente.");
+	        return "redirect:/agricultor/agregar-productos";
 
 	    } catch (Exception e) {
 	        redirectAttributes.addFlashAttribute("error", "Error al registrar producto: " + e.getMessage());
