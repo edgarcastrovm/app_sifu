@@ -57,11 +57,11 @@ public class DataLoader implements CommandLineRunner {
         log.info("Termina insert roles");
         log.info("Inicia insertando usuarios");
         // Crear persona y usuario admin
-        crearPersonaYUsuario("1000000001", "admin", "admin@sifu.com", "098123456", "admin", "admin", rolAdmin);
+        crearPersonaYUsuario("1000000001", "admin", "admin@sifu.com", "0981234561", "admin", "admin", rolAdmin);
         // Crear persona y usuario cliente
-        crearPersonaYUsuario("2000000001", "cliente", "cliente@sifu.com", "098233456", "cliente", "clave123", rolCliente);
+        crearPersonaYUsuario("2000000001", "cliente", "cliente@sifu.com", "0982334562", "cliente", "clave123", rolCliente);
         // Crear persona y usuario agricultor
-        crearPersonaYUsuario("3000000001", "agricultor", "agricultor@sifu.com", "081233456", "agricultor", "clave123", rolAgricultor);
+        crearPersonaYUsuario("3000000001", "agricultor", "agricultor@sifu.com", "0812334563", "agricultor", "clave123", rolAgricultor);
         log.info("Termina insert usuarios");
 
         try {
