@@ -1,17 +1,31 @@
 package com.sifu.core.controller.site;
 
+import com.sifu.core.service.AnuncioService;
+import com.sifu.core.service.security.CustomIUserDetails;
+import com.sifu.core.utils.entity.Agricultor;
+import com.sifu.core.utils.entity.Anuncio;
+import com.sifu.core.utils.entity.Usuario;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/site")
 public class SiteController {
 	
 	private static final Logger log = LogManager.getLogger(SiteController.class);
+	private final AnuncioService anuncioService;
+
+	public SiteController(AnuncioService anuncioService) {
+		this.anuncioService = anuncioService;
+	}
 
 	@GetMapping("/")
 	public String index() {
@@ -67,4 +81,12 @@ public class SiteController {
 		return "cliente/carrito";
 	}
 
+	@GetMapping("/anuncios")
+	public String mostrarAnuncios(Model model) {
+		log.info("mostrarFormulario() called");
+		List<Anuncio> anuncios = anuncioService.obtenerTodosAnuncios();
+		model.addAttribute("anunciosGuardados", anuncios);
+		model.addAttribute("modoEdicion", false);
+		return "public/anuncios";
+	}
 }

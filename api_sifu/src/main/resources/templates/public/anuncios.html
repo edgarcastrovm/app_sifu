@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" layout:decorate="~{layout}"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<title>Perfil-Cliente</title>
+</head>
+<body>
+	<div class="row" layout:fragment="content">
+		<div class="card">
+			<h4>Anuncios Publicados</h4>
+			<table class="table table-striped table-hover bg-success">
+				<thead class="table-primary">
+					<tr>
+						<th>Descripción</th>
+						<th>Estado</th>
+						<th>Fecha</th>
+						<th>Agricultor</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="anuncio : ${anunciosGuardados}">
+						<td th:text="${anuncio.descripcion}"></td>
+						<td th:text="${anuncio.estado}"></td>
+						<td
+							th:text="${#temporals.format(anuncio.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></td>
+						<td>
+							<span th:text="${anuncio.agricultor.persona.nombre}"></span>
+							-
+							<span th:text="${anuncio.agricultor.persona.cedula}"></span>
+							-
+							<span th:text="${anuncio.agricultor.persona.correo}"></span>
+						</td>
+
+					</tr>
+				</tbody>
+			</table>
+			<br>
+			<!--         <a th:href="@{/site/editarAnuncio/{id}(id=${anuncio.id})}" class="btn btn-danger">Eliminar Anuncio</a> -->
+		</div>
+	</div>
+</body>
+</html>

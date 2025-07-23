@@ -64,4 +64,10 @@ public class AnuncioServiceImpl implements AnuncioService {
 		return anuncioRepository.findByAgricultorId(id);
 	}
 
+	@Override
+	public List<Anuncio> obtenerTodosAnuncios() {
+		log.info("obtenerTodosAnuncios() called");
+		return anuncioRepository.findAll();
+	}
+
 }

@@ -14,6 +14,7 @@ public interface AnuncioService {
 	void eliminarAnuncio(Integer id);
 	
 	List<Anuncio> obtenerAnunciosPorAgricultor(Integer id);
-	
 
+
+	List<Anuncio> obtenerTodosAnuncios();
 }
