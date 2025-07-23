@@ -81,6 +81,8 @@ public class DataLoader implements CommandLineRunner {
                 p.setApellido(nombre);
                 p.setCorreo(correo);
                 p.setCelular(celular);
+                p.setCanton("QUITO");
+                p.setProvincia("PICHINCHA");
                 return personaRepository.save(p);
             });
             log.info("Persona con cedula " + cedula + " registrado");
